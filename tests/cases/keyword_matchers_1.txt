@@ -1,0 +1,34 @@
+19
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for stdio.h... yes
+checking for pthread_create in -lpthread... yes
+checking size of long... 8
+checking whether byte ordering is bigendian... no
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+Checking for gcc... gcc
+Checking if malloc works... yes with warnings
+Checking whether pthreads work... (cached) yes
+Checking whether to build shared libraries... no
+Checking size of int... 4
+checking for gcc option to enable C11 features... none needed
+checking for suffix of executables...
+---------------------------------------------------------------------------
+[{"e":17,"b":14,"hl":"CompileLuaHint"},{"e":24,"b":21,"hl":"CompileLuaWarning"}]
+[{"e":38,"b":18,"hl":"CompileLuaHint"},{"e":45,"b":42,"hl":"CompileLuaInfo"}]
+[{"e":21,"b":14,"hl":"CompileLuaHint"},{"e":28,"b":25,"hl":"CompileLuaInfo"}]
+[{"e":41,"b":14,"hl":"CompileLuaHint"},{"e":48,"b":45,"hl":"CompileLuaInfo"}]
+[{"e":22,"b":10,"hl":"CompileLuaHint"},{"e":27,"b":26,"hl":"CompileLuaWarning"}]
+[{"e":44,"b":18,"hl":"CompileLuaHint"},{"e":50,"b":48,"hl":"CompileLuaError"}]
+nil
+nil
+nil
+[{"e":17,"b":14,"hl":"CompileLuaHint"},{"e":24,"b":21,"hl":"CompileLuaWarning"}]
+[{"e":25,"b":13,"hl":"CompileLuaHint"},{"e":46,"b":29,"hl":"CompileLuaInfo"}]
+[{"e":31,"b":18,"hl":"CompileLuaHint"},{"e":47,"b":44,"hl":"CompileLuaInfo"}]
+[{"e":43,"b":21,"hl":"CompileLuaHint"},{"e":49,"b":47,"hl":"CompileLuaError"}]
+[{"e":21,"b":10,"hl":"CompileLuaHint"},{"e":26,"b":25,"hl":"CompileLuaWarning"}]
+[{"hl":"CompileLuaHint","b":14,"e":47},{"hl":"CompileLuaWarning","b":51,"e":62}]
+[{"e":35,"hl":"CompileLuaHint","b":14}]

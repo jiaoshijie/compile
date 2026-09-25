@@ -1,0 +1,68 @@
+36
+error[E0384]: cannot assign twice to immutable variable `x`
+ --> ./src/mai:3:8:n.rs:3:5
+  |
+2 |     let x = 10;
+  |         - first assignment to `x`
+3 |     x = 20;
+  |     ^^^^^^ cannot assign twice to immutable variable
+  |
+help: consider making this binding mutable
+  |
+2 |     let mut x = 10;
+  |         +++
+
+error[E0596]: cannot borrow `hjkl` as mutable, as it is not declared as mutable
+ --> main.rs:6:13
+  |
+6 |     let a = &mut hjkl;
+  |             ^^^^^^^^^ cannot borrow as mutable
+  |
+
+warning: variable `x` is assigned to, but never used
+ --> main.rs:2:9
+  |
+2 |     let x = 10;
+  |         ^
+  |
+  = note: consider using `_x` instead
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+error: aborting due to 2 previous errors; 3 warnings emitted
+
+Some errors have detailed explanations: E0384, E0596.
+For more information about an error, try `rustc --explain E0384`.
+------------------------------------------------------------------------------
+{"type_hl":{"e":13,"b":1,"hl":"CompileLuaError"},"col":{"b":87,"e":88,"c":"5"},"line":{"b":85,"e":86,"c":"3"},"link":{"e":88,"b":66},"b":1,"e":88,"file":{"b":66,"e":84,"c":"./src/mai:3:8:n.rs"},"type":3}
+
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+{"file":{"c":"main.rs","e":93,"b":86},"type":3,"e":98,"b":1,"type_hl":{"hl":"CompileLuaError","e":13,"b":1},"col":{"c":"13","e":98,"b":96},"line":{"c":"6","e":95,"b":94},"link":{"b":86,"e":98}}
+
+nil
+nil
+nil
+nil
+nil
+{"file":{"c":"main.rs","e":66,"b":59},"type":2,"e":70,"b":1,"type_hl":{"hl":"CompileLuaWarning","e":8,"b":1},"col":{"c":"9","e":70,"b":69},"line":{"c":"2","e":68,"b":67},"link":{"b":59,"e":70}}
+
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+number
+nil
+nil
+nil

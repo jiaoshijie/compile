@@ -1,0 +1,26 @@
+15
+make: ajdakjds
+make[1]: ajdkajsd
+make[23]: adjkasjd
+gmake: ajdkajs
+foo/bar: akdajs
+make[1]: Entering directory '/project/src'
+make[2]: Leaving directory '/project/lib'
+make: jadkjsadas
+make : ajdjakdasj
+make	: jakdjsad
+make[1]: ajksdjad
+make[1] : jdakdjsad
+---------------------------------------------------------------------------
+[{"b":1,"hl":"CompileLuaHint","e":5}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":7}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":8}]
+[{"b":1,"hl":"CompileLuaHint","e":6}]
+[{"b":1,"hl":"CompileLuaHint","e":8}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":7}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":7}]
+[{"b":1,"hl":"CompileLuaHint","e":5}]
+[{"b":1,"hl":"CompileLuaHint","e":5}]
+[{"b":1,"hl":"CompileLuaHint","e":5}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":7}]
+[{"b":1,"hl":"CompileLuaHint","e":5},{"b":6,"hl":"CompileLuaWarning","e":7}]

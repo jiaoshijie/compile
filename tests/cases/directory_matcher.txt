@@ -1,0 +1,16 @@
+10
+make -C abcd hjkl
+make[1]: Entering directory '/tmp/abcd/abcd'hjkl'
+grep -rIn main
+main.c:1: main() {
+Makefile:2:     grep -rIn main
+main.rs:1:fn main() {
+make[1]: Leaving directory '/tmp/abcd/abcd'hjkl'
+--------------------------------------------------------------------------
+nil
+{"b":30,"e":49,"dir":"/tmp/abcd/abcd'hjkl","enter":true}
+nil
+nil
+nil
+nil
+{"b":29,"e":48,"dir":"/tmp/abcd/abcd'hjkl","enter":false}

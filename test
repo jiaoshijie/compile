@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(dirname "$0")
+
+cd "$SCRIPT_DIR"
+
+RUN_TEST_CASE=
+RUN_ALL_TEST=
+NEOVIM_BIN_PATH=${JSJ_NEOVIM_BIN:-$(command -v nvim)}
+
+while getopts "n:a" opt; do
+  case "$opt" in
+    a)
+      RUN_ALL_TEST=1
+      ;;
+    n)
+      NEOVIM_BIN_PATH="$OPTARG"
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
+RUN_TEST_CASE="$*"
+
+if [[ "$TERM" == "dumb" ]]; then
+  RED='\e[1;31m'
+  RESET='\e[0m'
+else
+  RED=
+  RESET=
+fi
+
+fatal() {
+  echo -e "${RED}FATAL_ERROR${RESET}: $*"
+  exit 1
+}
+
+single_test() {
+  local test_case=${1:-$RUN_TEST_CASE}
+  [[ -z "$test_case" ]] && fatal "No test case specified"
+  [[ -f "$test_case" ]] || fatal "test case ($test_case) not found"
+
+  eval "$NEOVIM_BIN_PATH --clean --headless -c 'set rtp+=.' -l '$test_case'" || exit 1
+}
+
+all_test() {
+  shopt -s nullglob
+
+  for case in tests/cfg/*.lua tests/matchers/*.lua; do
+    echo "--------------------------------------------------------------------"
+    single_test "$case" || exit 1
+    echo "--------------------------------------------------------------------"
+  done
+
+  exit 0
+}
+
+[[ -x "$NEOVIM_BIN_PATH" ]] || fatal "No neovim binary file found"
+
+[[ -n "$RUN_ALL_TEST" ]] && all_test
+
+single_test

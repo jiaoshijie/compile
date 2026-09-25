@@ -1,0 +1,62 @@
+33
+foo.c:8: message
+../foo.c:8: W: message
+/tmp/foo.c:8:warning message
+foo/bar.py:8: FutureWarning message
+foo.py:8: RuntimeWarning message
+foo.c:8:I: message
+foo.c:8.23: note: message
+foo.c:8.23: info: message
+foo.c:8:23:information: message
+foo.c:8.23-45: Informational: message
+foo.c:8-23: message
+foo.c:8-45.3: message
+foo.c:8.23-9.1: message
+foo.c:8-23:9-1: message
+foo.el:3:1:Error: End of file during parsing
+jade:dbcommon.dsl:133:17:E: missing argument for function call
+G:/cygwin/dev/build-myproj.xml:54: Compiler Adapter 'javac' can't be found.
+file:G:/cygwin/dev/build-myproj.xml:54: Compiler Adapter 'javac' can't be found.
+{standard input}:27041: Warning: end of file not at end of a line; newline inserted
+boost/container/detail/flat_tree.hpp:589:25:   [ skipping 5 instantiation contexts, use -ftemplate-backtrace-limit=0 to disable ]
+   |
+   |board.h:60:21:
+   |   60 | #define I(b, C) ((C).y * (b)->width + (C).x)
+../dots/.git/logs/refs/heads/main:5:1f3c703b3ed2850e47b4de537a9747a1f388c2f9 ce9d54b27d92cbcbe5ef6a80bd04663f97a2c925 jiaoshijie <jiao1751959040@gmail.com> 1761450629 +0800	commit: update vimrc
+2026年 09月 10日 星期四 11:20:03 CST
+Thu Sep 10 11:20:08 CST 2026
+main.c:123:456: note: message
+main.c:1:2345: note: message
+main.txt:1:123456
+  src/add.cpp:8:31: error: invalid operands of types ‘const double’ and ‘const double*’ to binary ‘operator+’
+---------------------------------------------------------------------------
+{"e":10,"file":{"b":1,"c":"foo.c","e":6},"line":{"b":7,"c":"8","e":8},"type":3,"b":1,"link":{"b":1,"e":8}}
+{"link":{"e":11,"b":1},"b":1,"e":15,"file":{"b":1,"c":"../foo.c","e":9},"line":{"b":10,"c":"8","e":11},"type":2}
+{"type":2,"e":21,"link":{"e":13,"b":1},"line":{"c":"8","e":13,"b":12},"file":{"c":"/tmp/foo.c","e":11,"b":1},"b":1}
+{"type":2,"link":{"e":13,"b":1},"e":28,"b":1,"file":{"c":"foo/bar.py","e":11,"b":1},"line":{"c":"8","e":13,"b":12}}
+{"e":25,"b":1,"line":{"e":9,"b":8,"c":"8"},"file":{"e":7,"b":1,"c":"foo.py"},"link":{"e":9,"b":1},"type":2}
+{"link":{"e":8,"b":1},"e":11,"file":{"c":"foo.c","e":6,"b":1},"b":1,"line":{"c":"8","e":8,"b":7},"type":1}
+{"e":17,"type":1,"file":{"b":1,"c":"foo.c","e":6},"b":1,"line":{"b":7,"c":"8","e":8},"col":{"b":9,"c":"23","e":11},"link":{"b":1,"e":11}}
+{"b":1,"col":{"b":9,"c":"23","e":11},"link":{"e":11,"b":1},"line":{"b":7,"c":"8","e":8},"e":17,"type":1,"file":{"b":1,"c":"foo.c","e":6}}
+{"file":{"b":1,"c":"foo.c","e":6},"e":23,"line":{"b":7,"c":"8","e":8},"link":{"e":11,"b":1},"col":{"b":9,"c":"23","e":11},"type":1,"b":1}
+{"type":1,"line":{"e":8,"b":7,"c":"8"},"link":{"b":1,"e":14},"b":1,"e":29,"line_end":{"e":14,"b":12,"c":"45"},"file":{"e":6,"b":1,"c":"foo.c"},"col":{"e":11,"b":9,"c":"23"}}
+{"link":{"b":1,"e":11},"b":1,"line":{"b":7,"c":"8","e":8},"type":3,"line_end":{"b":9,"c":"23","e":11},"file":{"b":1,"c":"foo.c","e":6},"e":13}
+{"line_end":{"e":11,"b":9,"c":"45"},"e":15,"b":1,"col_end":{"e":13,"b":12,"c":"3"},"line":{"e":8,"b":7,"c":"8"},"file":{"e":6,"b":1,"c":"foo.c"},"link":{"e":13,"b":1},"type":3}
+{"e":17,"col":{"b":9,"c":"23","e":11},"col_end":{"b":14,"c":"1","e":15},"b":1,"type":3,"link":{"b":1,"e":15},"file":{"b":1,"c":"foo.c","e":6},"line":{"b":7,"c":"8","e":8},"line_end":{"b":12,"c":"9","e":13}}
+wrong
+{"type":3,"col":{"c":"1","e":11,"b":10},"e":17,"link":{"e":11,"b":1},"line":{"c":"3","e":9,"b":8},"file":{"c":"foo.el","e":7,"b":1},"b":1}
+{"line":{"c":"133","e":22,"b":19},"link":{"e":25,"b":6},"file":{"c":"dbcommon.dsl","e":18,"b":6},"b":1,"col":{"c":"17","e":25,"b":23},"type":3,"e":27}
+{"type":3,"line":{"b":32,"c":"54","e":34},"e":36,"link":{"e":34,"b":1},"b":1,"file":{"b":1,"c":"G:/cygwin/dev/build-myproj.xml","e":31}}
+{"line":{"b":37,"c":"54","e":39},"link":{"e":39,"b":6},"file":{"b":6,"c":"G:/cygwin/dev/build-myproj.xml","e":36},"b":1,"e":41,"type":3}
+{"file":{"e":17,"b":1,"c":"{standard input}"},"e":32,"b":1,"link":{"b":1,"e":23},"line":{"e":23,"b":18,"c":"27041"},"type":2}
+{"file":{"c":"boost/container/detail/flat_tree.hpp","e":37,"b":1},"type":1,"e":130,"b":1,"line":{"c":"589","e":41,"b":38},"link":{"e":44,"b":1},"col":{"c":"25","e":44,"b":42}}
+nil
+{"file":{"c":"board.h","e":12,"b":5},"line":{"c":"60","e":15,"b":13},"link":{"e":18,"b":5},"b":1,"e":19,"type":3,"col":{"c":"21","e":18,"b":16}}
+nil
+{"line":{"c":"5","e":36,"b":35},"b":1,"type":3,"file":{"c":"../dots/.git/logs/refs/heads/main","e":34,"b":1},"e":39,"link":{"e":36,"b":1}}
+nil
+nil
+{"col":{"c":"456","e":15,"b":12},"link":{"b":1,"e":15},"e":21,"b":1,"line":{"c":"123","e":11,"b":8},"type":1,"file":{"c":"main.c","e":7,"b":1}}
+{"col":{"c":"2345","e":14,"b":10},"link":{"b":1,"e":14},"e":20,"b":1,"line":{"c":"1","e":9,"b":8},"type":1,"file":{"c":"main.c","e":7,"b":1}}
+{"b":1,"e":18,"link":{"b":1,"e":11},"file":{"b":1,"c":"main.txt","e":9},"type":3,"line":{"b":10,"c":"1","e":11}}
+{"file":{"b":3,"e":14,"c":"src/add.cpp"},"type":3,"line":{"b":15,"e":16,"c":"8"},"link":{"e":19,"b":3},"col":{"b":17,"e":19,"c":"31"},"b":1,"e":26}
