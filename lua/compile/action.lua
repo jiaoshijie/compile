@@ -29,7 +29,7 @@ _M.kill_compilation = function(ctx)
 end
 
 local send_input = function(ctx, input)
-    vim.cmd("redraw")
+    vim.cmd([[redraw]])
 
     if not input then
         return
@@ -235,20 +235,31 @@ local get_path_from_fe = function(ctx, fe, lnum)
         end
     end
 
-    local ok, fixed_path = pcall(vim.fn.input, {
-        prompt = fmt("Find this %s in: ", get_val("error_msg", ctx.lcfg)),
-        default = path,
+    local ok, fixed_path = false, nil
+    vim.ui.input({
         completion = "file",
-        cancelreturn = "",
-    })
+        default = path,
+        prompt = fmt("Find this %s in: ", get_val("error_msg", ctx.lcfg)),
+    }, function(input)
+        vim.cmd([[redraw]])
+        if not input then
+            return
+        end
 
-    if ok and #fixed_path > 1 and string.sub(fixed_path, 1, 1) == "/"
-        and vim.uv.fs_stat(fixed_path) then
+        fixed_path = input
+
+        if #fixed_path > 1 and string.sub(fixed_path, 1, 1) == "/"
+            and vim.uv.fs_stat(fixed_path) then
+            ok = true
+        end
+    end)
+
+    if ok then
         fe.fixed_path = fixed_path
-        return fe.fixed_path
+        return fixed_path
     end
 
-    kit.echo_err_msg(fmt("%s does not exist", ok and fixed_path or path))
+    kit.echo_err_msg(fmt("%s does not exist", fixed_path or path))
     return nil
 end
 

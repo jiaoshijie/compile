@@ -4,15 +4,15 @@ local _M = {}
 --- @param buf_name string?
 --- @param cfg table
 _M.compile = function(cmd, buf_name, cfg)
-    require("compile.runtime").compile(cmd, buf_name, cfg)
+    require("compile.runtime").compile(cmd, buf_name, cfg or {})
 end
 
 _M.norm_ro = function(bufnr, cfg)
-    require("compile.runtime").norm(true, bufnr, cfg)
+    require("compile.runtime").norm(true, bufnr, cfg or {})
 end
 
 _M.norm_rw = function(bufnr, cfg)
-    require("compile.runtime").norm(false, bufnr, cfg)
+    require("compile.runtime").norm(false, bufnr, cfg or {})
 end
 
 _M.ls = function()
