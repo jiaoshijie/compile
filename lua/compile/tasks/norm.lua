@@ -7,27 +7,9 @@ local fmt = string.format
 local _M = {}
 
 local init_ctx = function(ctx)
-    -- TODO: move most of configuration to base class init_ctx
-    local cwd = task_lib.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
-    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
-    ctx.dir_stack_arr = {}
-    ctx.lookup = {}
-    ctx.debug = nil
-    ctx.stat_info = {
-        ret_code = false,
-        [constants.Severity.ERROR] = 0,
-        [constants.Severity.HINT] = 0,
-        [constants.Severity.INFO] = 0,
-        [constants.Severity.WARNING] = 0,
-    }
-    ctx.parse_info = {
-        lnum = 0,
-        fe_table = {},
-        last_fe = nil,
-        mismatched_index = nil,
-        matched = {},
-        eof = true,
-    }
+    task_lib.init_base_ctx(ctx)
+    ctx.stat_info.ret_code = false
+    ctx.parse_info.eof = true
 
     if ctx.type == constants.CompileType.NORMRO then
         -- child class
@@ -80,6 +62,7 @@ _M.parse = function(typ, bufnr, lcfg)
         type = typ,
         bufnr = bufnr,
         augroup_name = fmt("compile_lua_event_norm_%d", bufnr),
+
         lcfg = lcfg,
     }
 
@@ -100,16 +83,29 @@ _M.set_events = function(ev_group, bufnr, tasks)
         group = ev_group,
         callback = function(ev)
             local t = tasks[ev.buf]
-            if not t then
-                return
-            end
-
+            if not t then return end
             if t.type ~= constants.CompileType.NORMRO
                 and t.type ~= constants.CompileType.NORMRW then
                 return
             end
 
             reparse(t)
+        end,
+    })
+
+
+    vim.api.nvim_create_autocmd("BufUnload", {
+        buffer = bufnr,
+        group = ev_group,
+        callback = function(ev)
+            local t = tasks[ev.buf]
+            if not t then return end
+            if t.type ~= constants.CompileType.NORMRO
+                and t.type ~= constants.CompileType.NORMRW then
+                return
+            end
+
+            _M.cleanup(t)
         end,
     })
 end

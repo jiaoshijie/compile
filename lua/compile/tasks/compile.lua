@@ -49,27 +49,7 @@ end
 local init_ctx = function(ctx, cmd, lcfg, work_id)
     -- base class
     ctx.lcfg = refresh_env(lcfg)
-
-    local cwd = task_lib.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
-    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
-    ctx.dir_stack_arr = {}
-    ctx.lookup = {}
-    ctx.debug = nil
-    ctx.stat_info = {
-        ret_code = nil,
-        [constants.Severity.ERROR] = 0,
-        [constants.Severity.HINT] = 0,
-        [constants.Severity.INFO] = 0,
-        [constants.Severity.WARNING] = 0,
-    }
-    ctx.parse_info = {
-        lnum = 0,
-        fe_table = {},
-        last_fe = nil,
-        mismatched_index = nil,
-        matched = {},
-        eof = false,
-    }
+    task_lib.init_base_ctx(ctx)
 
     -- child class
     ctx.cmd = cmd
@@ -141,7 +121,16 @@ local parse = function(ctx, lines, finished)
         ctx.mismatched_lines = vim.list_slice(lines, parse_info.mismatched_index)
         lines = vim.list_slice(lines, 1, parse_info.mismatched_index - 1)
     end
-    -- 6. put all lines into compilation buffer
+
+    local output_parsed_hook = get_val("on_output_parsed_hook_fn", ctx.lcfg)
+    if type(output_parsed_hook) == "function" then
+        local new_lines = output_parsed_hook(parse_info.lnum, lines)
+        if #new_lines == #lines then
+            lines = new_lines
+        end
+    end
+
+    -- put all lines into compilation buffer
     if #lines > 0 then
         ui.set_lines(ctx, parse_info.lnum, lines)
         local output_inserted_hook = get_val("on_output_inserted_hook_fn", ctx.lcfg)
@@ -190,6 +179,15 @@ local set_win_options = function(winid)
     vim.api.nvim_set_option_value('colorcolumn', '0', opts)
 end
 
+local job_finish = function(ctx, ret_code)
+    ui.render_stop_info_comp(ctx, ret_code)
+    -- NOTE: make sure all lines has been flushed
+    ui.flush_cache(ctx)
+    ctx.stat_info.ret_code = ret_code
+    cleanup(ctx)
+    vim.cmd([[redrawstatus!]])
+end
+
 ------------------------------------------------------------------------------
 
 --- @param ctx CompileCtx
@@ -231,6 +229,13 @@ _M.run = function(ctx, cmd, lcfg)
     init_ctx(ctx, cmd, lcfg, work_id)
     load_buf(ctx.bufnr)
 
+    ui.render_start_info_comp(ctx)
+
+    if not get_val("background", ctx.lcfg) then
+        local winid = ui.display_com_win(ctx.bufnr)
+        set_win_options(winid)
+    end
+
     -- TODO: parse `cd` command
 
     local ok, ret = pcall(vim.fn.jobstart, ctx.cmd, {
@@ -248,17 +253,12 @@ _M.run = function(ctx, cmd, lcfg)
 
             parse(ctx, { ctx.remain_chunk }, true)
 
-            ui.render_stop_info_comp(ctx, ret_code)
-            -- NOTE: make sure all lines has been flushed
-            ui.flush_cache(ctx)
-            ctx.stat_info.ret_code = ret_code
+            job_finish(ctx, ret_code)
 
             local job_finished_hook = get_val("on_job_finished_hook_fn", ctx.lcfg)
             if type(job_finished_hook) == "function" then
                 job_finished_hook(ret_code)
             end
-            cleanup(ctx)
-            vim.cmd([[redrawstatus!]])
         end,
         on_stdout = function(_, data, _)
             if ctx.is_terminated or work_id ~= ctx.task_id then return end
@@ -280,23 +280,23 @@ _M.run = function(ctx, cmd, lcfg)
     })
 
     if not ok then
+        -- NOTE: no any hook funcitons will be called
+        local parse_info = ctx.parse_info
+        assert(parse_info)
+
         if type(ret) == "string" then
-            kit.echo_err_msg(ret)
+            local lines = vim.fn.split(ret, '\n')
+            table.insert(lines, 1, "Neovim Compile Plugin Internal Error:")
+            ui.set_lines(ctx, parse_info.lnum, lines)
+            parse_info.lnum = parse_info.lnum + #lines
         end
 
-        -- TODO
+        job_finish(ctx, -1)
         return
     end
 
     ctx.job_id = ret
     vim.b[ctx.bufnr].channel = ctx.job_id
-
-    if not get_val("background", ctx.lcfg) then
-        local winid = ui.display_com_win(ctx.bufnr)
-        set_win_options(winid)
-    end
-
-    ui.render_start_info_comp(ctx)
 
     if get_val("close_stdin", ctx.lcfg) then
         vim.fn.chansend(ctx.job_id, string.char(4))
@@ -357,6 +357,20 @@ _M.set_events = function(ev_group, bufnr, tasks)
             end
 
             _M.run(t, t.cmd, t.lcfg)
+        end,
+    })
+
+    vim.api.nvim_create_autocmd("BufUnload", {
+        buffer = bufnr,
+        group = ev_group,
+        callback = function(ev)
+            local t = tasks[ev.buf]
+            if not t or t.type ~= constants.CompileType.COMP then
+                return
+            end
+
+            --- @cast t CompileCtx
+            _M.stop_task(t, true)
         end,
     })
 end

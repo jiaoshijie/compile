@@ -84,25 +84,6 @@ local set_events = function(task)
             tasks[ev.buf] = nil
         end,
     })
-
-    -- TODO: move to tasks
-    vim.api.nvim_create_autocmd("BufUnload", {
-        buffer = task.bufnr,
-        group = ev_group,
-        callback = function(ev)
-            local t = tasks[ev.buf]
-            if not t then return end
-            if t.type == constants.CompileType.COMP then
-                --- @cast t CompileCtx
-                task_entries[t.type].stop_task(t, true)
-            elseif t.type == constants.CompileType.NORMRO
-                or t.type == constants.CompileType.NORMRW then
-                task_entries[t.type].cleanup(t)
-            else
-                assert(false and "unreachable")
-            end
-        end,
-    })
 end
 
 local set_user_cmd = function(task)

@@ -542,4 +542,27 @@ _M.parse = function(ctx, lines)
     parse_keywords(ctx, lines)
 end
 
+_M.init_base_ctx = function(ctx)
+    local cwd = _M.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
+    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
+    ctx.dir_stack_arr = {}
+    ctx.lookup = {}
+    ctx.debug = nil
+    ctx.stat_info = {
+        ret_code = nil,
+        [constants.Severity.ERROR] = 0,
+        [constants.Severity.HINT] = 0,
+        [constants.Severity.INFO] = 0,
+        [constants.Severity.WARNING] = 0,
+    }
+    ctx.parse_info = {
+        lnum = 0,
+        fe_table = {},
+        last_fe = nil,
+        mismatched_index = nil,
+        matched = {},
+        eof = false,
+    }
+end
+
 return _M
