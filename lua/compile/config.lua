@@ -63,6 +63,14 @@ _M.keyword_matchers = {
     },
 }
 
+--- NOTE: all below matchers are only used in CompileType.COMP
+
+--- @alias CmdCdPattern vim.lpeg.Pattern
+--- This pattern should return CmdCdCapture
+--- @type CmdCdPattern
+--- TODO:
+-- _M.cmd_cd_matcher = P{}
+
 ----------------------------- callbacks --------------------------------------
 
 --- @type fun(fname: string): string
@@ -104,7 +112,7 @@ _M.debug = false
 --- @type string
 _M.error_msg = "error"
 
---- @type string? -- absolute path or can be expand to absolute path by vim.fn.expand
+--- @type string? -- absolute path or can be expand to absolute path by vim.fs.normalize
 _M.cwd = nil
 
 --- motion action will skip less important messages.

@@ -117,9 +117,10 @@ local update_dir_stack = function(ctx, idx, cap)
     })
 
     if not kit.is_absolute_path(cap.dir) then
-        cap.dir = fmt("%s/%s", ctx.dir_stack[#ctx.dir_stack],
-            kit.unify_path(cap.dir, true))
+        cap.dir = fmt("%s/%s", ctx.dir_stack[#ctx.dir_stack], cap.dir)
     end
+
+    cap.dir = kit.normalize_path(cap.dir)
 
     if cap.enter then
         table.insert(ctx.dir_stack, cap.dir)
@@ -199,7 +200,7 @@ local parse_transform_file_matchers = function(ctx, file)
 end
 
 local new_file_entry = function(ctx, info, idx, file)
-    file = kit.unify_path(file, false)
+    file = kit.normalize_path(file)
 
     if kit.is_absolute_path(file) then
         local fe = info.fe_table[file]
@@ -544,7 +545,7 @@ end
 
 _M.init_base_ctx = function(ctx)
     local cwd = _M.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
-    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
+    ctx.dir_stack = { kit.normalize_path(cwd) }
     ctx.dir_stack_arr = {}
     ctx.lookup = {}
     ctx.debug = nil

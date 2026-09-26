@@ -65,19 +65,9 @@ _M.redraw = function()
 end
 
 --- @param path string
---- @param is_dir boolean
 --- @return string
-_M.unify_path = function(path, is_dir)
-    if string.sub(path, 1, 2) == "./" then
-        path = string.sub(path, 3)
-    end
-
-    if string.sub(path, #path) == "/" then
-        assert(is_dir)
-        path = string.sub(path, 1, #path - 1)
-    end
-
-    return path
+_M.normalize_path = function(path)
+    return vim.fs.normalize(path, { expand_env = true, win = false })
 end
 
 --- @param path string

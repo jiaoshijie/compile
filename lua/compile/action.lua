@@ -276,6 +276,7 @@ _M.display_error = function(ctx)
 
     local abs_path = get_path_from_fe(ctx, msg.fe, lnum)
     if not abs_path then return nil end
+    abs_path = kit.normalize_path(abs_path)
 
     -- three situations here.
     -- 1. path has been loaded and buffer is being displayed in a window
