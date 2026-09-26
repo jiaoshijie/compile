@@ -12,9 +12,10 @@
 --- @field enter boolean true: enter directory, false: leave directory
 --- @field dir string absolute path | relative path (will be construct to absolute path according to the current directory stack)
 
--- `number` means the single `cd` which means goto the home directory
+-- `nil` means the single `cd` which means goto the home directory
 -- `string` means it is the match path, which can be absolute or relative. `cd 'abcd'`
---- @alias CmdCdCapture string | number
+--- @class CmdCdCapture
+--- @field dir string?
 
 --- 1. If "file", "line" or "col" are nil, that information is not present on the matched line.
 ---    In that case the filename is assumed to be the same as the previous one,

@@ -179,13 +179,51 @@ local set_win_options = function(winid)
     vim.api.nvim_set_option_value('colorcolumn', '0', opts)
 end
 
+--- @param ctx CompileCtx
+--- @param ret_code integer
 local job_finish = function(ctx, ret_code)
     ui.render_stop_info_comp(ctx, ret_code)
-    -- NOTE: make sure all lines has been flushed
-    ui.flush_cache(ctx)
+    ui.flush_cache(ctx)  -- NOTE: make sure all lines has been flushed
     ctx.stat_info.ret_code = ret_code
     cleanup(ctx)
     vim.cmd([[redrawstatus!]])
+end
+
+--- @param ctx CompileCtx
+--- @param cmd string
+local parse_cmd_leading_cd = function(ctx, cmd)
+    local cmd_cd_matcher = get_val("cmd_cd_matcher", ctx.lcfg)
+
+    if vim.lpeg.type(cmd_cd_matcher) ~= "pattern" then
+        return
+    end
+
+    local cap = cmd_cd_matcher:match(cmd)
+
+    if not cap then return end
+
+    if not cap.dir then
+        table.insert(ctx.dir_stack, vim.env.HOME)
+        return
+    end
+
+    local path = cap.dir
+    local ch = path:sub(1, 1)
+
+    if ch == "'" then
+        path = path:sub(2, #path - 1)
+    else
+        if ch == '"' then path = path:sub(2, #path - 1) end
+        path = kit.normalize_path_no_env(path:gsub("\\(.)", "%1"))
+    end
+
+    if kit.is_absolute_path(path) then
+        table.insert(ctx.dir_stack, path)
+    else
+        assert(#ctx.dir_stack == 1)
+        table.insert(ctx.dir_stack,
+            kit.normalize_path_no_env(fmt("%s/%s", ctx.dir_stack[1], path)))
+    end
 end
 
 ------------------------------------------------------------------------------
@@ -229,14 +267,14 @@ _M.run = function(ctx, cmd, lcfg)
     init_ctx(ctx, cmd, lcfg, work_id)
     load_buf(ctx.bufnr)
 
+    parse_cmd_leading_cd(ctx, cmd)
+
     ui.render_start_info_comp(ctx)
 
     if not get_val("background", ctx.lcfg) then
         local winid = ui.display_com_win(ctx.bufnr)
         set_win_options(winid)
     end
-
-    -- TODO: parse `cd` command
 
     local ok, ret = pcall(vim.fn.jobstart, ctx.cmd, {
         pty = true,

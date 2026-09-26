@@ -325,7 +325,7 @@ _M.render_start_info_comp = function(task)
 
     local lnum = task.parse_info.lnum
     local lines = {
-        fmt("Working Directory: %s", task.dir_stack[1]),
+        fmt("Working Directory: %s", task.dir_stack[#task.dir_stack]),
         fmt("Compilation started at %s", vim.fn.strftime("%c")),
         fmt("Cmd: %s", task.cmd),
         fmt(""),

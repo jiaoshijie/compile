@@ -66,10 +66,22 @@ _M.keyword_matchers = {
 --- NOTE: all below matchers are only used in CompileType.COMP
 
 --- @alias CmdCdPattern vim.lpeg.Pattern
---- This pattern should return CmdCdCapture
+--- This pattern should return CmdCdCapture.
+--- It should NOT be used to parse complex path.
+--- Only Tilde Expansion is supported.
+--- ENV Expansion is NOT supported
+--- It does NOT match ` $ characters in double quoted and unquoted path.
 --- @type CmdCdPattern
---- TODO:
--- _M.cmd_cd_matcher = P{}
+_M.cmd_cd_matcher = P{
+    CT(V"spaces" * P"cd" * V"spaces" * V"dir" ^ -1 * V"spaces" * V"end_chs"),
+    end_chs = S";&\n",
+    spaces = LOC.space ^ 0,
+    single = P"'" * (P(1) - P"'") ^ 1 * P"'",
+    double = P'"' * ((P"\\" * P(1)) + (P(1) - S'\\"`$')) ^ 1 * P'"',
+    except = (S'\'\\"`$' + LOC.space + V"end_chs"),
+    no_quote = ((P"\\" * P(1)) + (P(1) - V"except")) ^ 1,
+    dir = CG(V"single" + V"double" + V"no_quote", "dir"),
+}
 
 ----------------------------- callbacks --------------------------------------
 

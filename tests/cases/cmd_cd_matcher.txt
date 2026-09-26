@@ -1,0 +1,32 @@
+18
+cd
+cd;make
+cd      &; make
+cd abcd; make
+   cd 'abcd"hjkl'; make
+cd "abcd'hjkl"; make
+cd "abcd\"hjkl"; make
+cd "abcd"hjkl"; make
+cd "abcd/`pwd`"; make
+cd $HOME; make
+cd abcd\ hjkl; make
+cd ..; make
+cd ~/abcd;make
+cd ''; make
+cd ""; make
+------------------------------------------------------------------------------
+nil
+[]
+[]
+{"dir":"abcd"}
+{"dir":"'abcd\"hjkl'"}
+{"dir":"\"abcd'hjkl\""}
+{"dir":"\"abcd\\\"hjkl\""}
+nil
+nil
+nil
+{"dir":"abcd\\ hjkl"}
+{"dir":".."}
+{"dir":"~/abcd"}
+nil
+nil

@@ -120,7 +120,7 @@ local update_dir_stack = function(ctx, idx, cap)
         cap.dir = fmt("%s/%s", ctx.dir_stack[#ctx.dir_stack], cap.dir)
     end
 
-    cap.dir = kit.normalize_path(cap.dir)
+    cap.dir = kit.normalize_path_no_env(cap.dir)
 
     if cap.enter then
         table.insert(ctx.dir_stack, cap.dir)
@@ -200,7 +200,7 @@ local parse_transform_file_matchers = function(ctx, file)
 end
 
 local new_file_entry = function(ctx, info, idx, file)
-    file = kit.normalize_path(file)
+    file = kit.normalize_path_no_env(file)
 
     if kit.is_absolute_path(file) then
         local fe = info.fe_table[file]

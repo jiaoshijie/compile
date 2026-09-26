@@ -248,7 +248,7 @@ local get_path_from_fe = function(ctx, fe, lnum)
 
         fixed_path = input
 
-        if #fixed_path > 1 and string.sub(fixed_path, 1, 1) == "/"
+        if #fixed_path > 1 and fixed_path:sub(1, 1) == "/"
             and vim.uv.fs_stat(fixed_path) then
             ok = true
         end
@@ -276,7 +276,7 @@ _M.display_error = function(ctx)
 
     local abs_path = get_path_from_fe(ctx, msg.fe, lnum)
     if not abs_path then return nil end
-    abs_path = kit.normalize_path(abs_path)
+    abs_path = kit.normalize_path_no_env(abs_path)
 
     -- three situations here.
     -- 1. path has been loaded and buffer is being displayed in a window

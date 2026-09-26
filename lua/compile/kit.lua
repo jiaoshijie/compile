@@ -71,9 +71,15 @@ _M.normalize_path = function(path)
 end
 
 --- @param path string
+--- @return string
+_M.normalize_path_no_env = function(path)
+    return vim.fs.normalize(path, { expand_env = false, win = false })
+end
+
+--- @param path string
 --- @return boolean
 _M.is_absolute_path = function(path)
-    return string.sub(path, 1, 1) == "/"
+    return path:sub(1, 1) == "/"
 end
 
 return _M
