@@ -2,6 +2,7 @@ local constants = require("compile.constants")
 local kit = require("compile.kit")
 local ui = require("compile.ui")
 local task_lib = require("compile.tasks")
+local compile_task_lib = require("compile.tasks.compile")
 local fmt = string.format
 local get_val = task_lib.get_cfg_val
 
@@ -16,7 +17,7 @@ _M.recompile = function(ctx)
         return
     end
 
-    require("compile.tasks.compile").run(ctx, ctx.cmd, ctx.lcfg)
+    compile_task_lib.run(ctx, ctx.cmd, ctx.lcfg)
 end
 
 _M.kill_compilation = function(ctx)
@@ -24,7 +25,53 @@ _M.kill_compilation = function(ctx)
         return
     end
 
-    require("compile.tasks.compile").stop_task(ctx, false)
+    compile_task_lib.stop_task(ctx, false)
+end
+
+local send_input = function(ctx, input)
+    vim.cmd("redraw")
+
+    if not input then
+        return
+    end
+    if not compile_task_lib.is_running(ctx) then
+        kit.echo_info_msg("job has already finished.")
+        return
+    end
+
+    local ok, reason = pcall(vim.fn.chansend, ctx.job_id, input .. "\n")
+
+    if not ok and type(reason) == "string" then
+        kit.echo_err_msg(reason)
+    end
+end
+
+local stdin = function(ctx, is_secret)
+    if ctx.type ~= constants.CompileType.COMP then
+        return
+    end
+
+    if not compile_task_lib.is_running(ctx) then
+        kit.echo_info_msg("job is not running.")
+        return
+    end
+
+    if not is_secret then
+        vim.ui.input({ prompt = ctx.remain_chunk or "stdin: " }, function(input)
+            send_input(ctx, input)
+        end)
+    else
+        local input = vim.fn.inputsecret(ctx.remain_chunk or "password: ")
+        send_input(ctx, input)
+    end
+end
+
+_M.stdin = function(ctx)
+    stdin(ctx, false)
+end
+
+_M.stdin_secret = function(ctx)
+    stdin(ctx, true)
 end
 
 --- @return boolean
@@ -70,7 +117,7 @@ local next_err = function(ctx, cmp_cb)
 end
 
 local prev_err = function(ctx, cmp_cb)
-    local nav_severity = get_val("nav_severity", ctx.lcfg) or constants.Severity.WARNING
+    local skip_threshold = get_val("skip_threshold", ctx.lcfg) or constants.Severity.WARNING
     local cur = vim.api.nvim_win_get_cursor(0)
     local lnum = cur[1] - 1
     local skip = get_val("skip_the_same_location", ctx.lcfg)
@@ -79,7 +126,7 @@ local prev_err = function(ctx, cmp_cb)
 
     while lnum > 1 do
         local msg = task_lib.get_msg(ctx, lnum)
-        if msg and msg.type >= nav_severity
+        if msg and msg.type >= skip_threshold
             and not cmp_cb(msg, cur_msg, skip) then
             vim.api.nvim_win_set_cursor(0, { lnum, 0 })
             vim.cmd("normal! zz")
@@ -94,7 +141,6 @@ local prev_err = function(ctx, cmp_cb)
     return false
 end
 
--- TODO
 --- @return integer the window id that the bufnr will be placed at
 local chose_window = function()
     local wins = vim.api.nvim_tabpage_list_wins(0)
@@ -278,6 +324,17 @@ _M.display_prev_error = function(ctx)
     if _M.prev_error(ctx) then
         _M.display_error(ctx)
     end
+end
+
+--- @param level CompileSeverity?
+_M.set_skip_threshold = function(ctx, level)
+    if type(level) ~= "number" then
+        level = get_val("skip_threshold", ctx.lcfg)
+        print(constants.get_str_by_severity(level))
+        return
+    end
+
+    ctx.lcfg.skip_threshold = constants.get_valid_severity(level)
 end
 
 return _M

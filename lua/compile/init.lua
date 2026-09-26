@@ -15,8 +15,8 @@ _M.norm_rw = function(bufnr, cfg)
     require("compile.runtime").norm(false, bufnr, cfg)
 end
 
-_M.ls = function(details)
-    require("compile.runtime").ls(details)
+_M.ls = function()
+    require("compile.runtime").ls()
 end
 
 _M.statusline = function(winid)

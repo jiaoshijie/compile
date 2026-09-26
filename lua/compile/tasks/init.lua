@@ -108,7 +108,7 @@ local update_dir_stack = function(ctx, idx, cap)
     local lnum_0 = get_lnum(parse_info.lnum, idx, false)
     local lnum_1 = get_lnum(parse_info.lnum, idx, true)
 
-    local ext_id = ui.ui_set_dir_hl(ctx, { lnum_0, cap.b - 1 },
+    local ext_id = ui.set_dir_hl(ctx, { lnum_0, cap.b - 1 },
         { lnum_0, cap.e - 1 })
 
     table.insert(ctx.dir_stack_arr, {
@@ -268,23 +268,23 @@ local highlight_error = function(ctx, caps, matcher, text, lnum)
 
     if caps.file then
         bt, et = get_pos_range(caps.file, multiline, text, lnum)
-        ui.ui_set_hl(ctx, constants.get_hl_by_severity(caps.type), bt, et)
+        ui.set_hl(ctx, constants.get_hl_by_severity(caps.type), bt, et)
     end
     if caps.line then
         bt, et = get_pos_range(caps.line, multiline, text, lnum)
-        ui.ui_set_hl(ctx, "CompileLuaLnum", bt, et)
+        ui.set_hl(ctx, "CompileLuaLnum", bt, et)
     end
     if caps.col then
         bt, et = get_pos_range(caps.col, multiline, text, lnum)
-        ui.ui_set_hl(ctx, "CompileLuaCol", bt, et)
+        ui.set_hl(ctx, "CompileLuaCol", bt, et)
     end
     if caps.line_end then
         bt, et = get_pos_range(caps.line_end, multiline, text, lnum)
-        ui.ui_set_hl(ctx, "CompileLuaLnum", bt, et)
+        ui.set_hl(ctx, "CompileLuaLnum", bt, et)
     end
     if caps.col_end then
         bt, et = get_pos_range(caps.col_end, multiline, text, lnum)
-        ui.ui_set_hl(ctx, "CompileLuaCol", bt, et)
+        ui.set_hl(ctx, "CompileLuaCol", bt, et)
     end
 
     -- other highlights
@@ -292,14 +292,14 @@ local highlight_error = function(ctx, caps, matcher, text, lnum)
         for _, key in ipairs(matcher.highlights) do
             if caps[key] then
                 bt, et = get_pos_range(caps[key], multiline, text, lnum)
-                ui.ui_set_hl(ctx, caps[key].hl, bt, et)
+                ui.set_hl(ctx, caps[key].hl, bt, et)
             end
         end
     end
 
     -- link
     bt, et = get_pos_range(caps.link or caps, multiline, text, lnum)
-    return ui.ui_set_link_hl(ctx, bt, et)
+    return ui.set_link_hl(ctx, bt, et)
 end
 
 -- 1-based line number
@@ -473,7 +473,7 @@ local parse_keywords = function(ctx, lines)
 
             local lnum0 = get_lnum(parse_info.lnum, idx, false)
             for _, cap in ipairs(caps) do
-                ui.ui_set_hl(ctx, cap.hl, { lnum0, cap.b - 1 },
+                ui.set_hl(ctx, cap.hl, { lnum0, cap.b - 1 },
                     { lnum0, cap.e - 1 }, is_matched(parse_info, 1, idx))
             end
 

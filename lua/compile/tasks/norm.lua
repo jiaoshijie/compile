@@ -7,10 +7,9 @@ local fmt = string.format
 local _M = {}
 
 local init_ctx = function(ctx)
-    local cwd = vim.fn.expand(task_lib.get_cfg_val("cwd", ctx.lcfg))
-
-    --- @cast cwd string
-    ctx.dir_stack = { kit.unify_path(cwd or vim.fn.getcwd(), true) }
+    -- TODO: move most of configuration to base class init_ctx
+    local cwd = task_lib.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
+    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
     ctx.dir_stack_arr = {}
     ctx.lookup = {}
     ctx.debug = nil

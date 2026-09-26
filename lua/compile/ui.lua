@@ -102,7 +102,6 @@ local create_com_win = function(bufnr, one_window)
     })
 end
 
--- TODO:
 --- @return integer
 _M.display_com_win = function(bufnr)
     if not bufnr or not vim.api.nvim_buf_is_loaded(bufnr) then
@@ -164,7 +163,7 @@ end
 --- @param task CompileCtx
 --- @param lnum integer
 --- @param line string
-_M.ui_set_line = function(task, lnum, line)
+local set_line = function(task, lnum, line)
     if #task.cache_lines >= constants.ui.cache_size then
         _M.flush_cache(task)
     end
@@ -185,9 +184,9 @@ end
 --- @param task CompileCtx
 --- @param lnum integer
 --- @param lines string[]
-_M.ui_set_lines = function(task, lnum, lines)
+_M.set_lines = function(task, lnum, lines)
     for _, line in ipairs(lines) do
-        _M.ui_set_line(task, lnum, line)
+        set_line(task, lnum, line)
         lnum = lnum + 1
     end
 end
@@ -240,7 +239,7 @@ end
 
 -- remove the ui prefix
 --- @param matched boolean?
-_M.ui_set_hl = function(task, group, spos, epos, matched)
+_M.set_hl = function(task, group, spos, epos, matched)
 
     if task.type == constants.CompileType.COMP
         or task.type == constants.CompileType.NORMRO then
@@ -265,7 +264,7 @@ _M.ui_set_hl = function(task, group, spos, epos, matched)
 end
 
 --- @return integer?
-_M.ui_set_link_hl = function(task, spos, epos)
+_M.set_link_hl = function(task, spos, epos)
     if task.type == constants.CompileType.COMP
         or task.type == constants.CompileType.NORMRO then
         task.hl_table[spos[1]] = task.hl_table[spos[1]] or {}
@@ -287,7 +286,7 @@ _M.ui_set_link_hl = function(task, spos, epos)
 end
 
 --- @return integer?
-_M.ui_set_dir_hl = function(task, spos, epos)
+_M.set_dir_hl = function(task, spos, epos)
     if task.type == constants.CompileType.COMP
         or task.type == constants.CompileType.NORMRO then
         task.hl_table[spos[1]] = task.hl_table[spos[1]] or {}
@@ -334,12 +333,12 @@ _M.render_start_info_comp = function(task)
 
     -- NOTE: reset the whole buffer immediately
     _M.clear(task)
-    _M.ui_set_lines(task, lnum, lines)
+    _M.set_lines(task, lnum, lines)
     -- NOTE: make sure the result line has been drawn before set virtual lines
     _M.flush_cache(task)
 
-    _M.ui_set_hl(task, "CompileLuaHint", { lnum, 19 }, { lnum, -1 })
-    _M.ui_set_hl(task, "CompileLuaInfo", { lnum + 2, 5 }, { lnum + 2, -1 })
+    _M.set_hl(task, "CompileLuaHint", { lnum, 19 }, { lnum, -1 })
+    _M.set_hl(task, "CompileLuaInfo", { lnum + 2, 5 }, { lnum + 2, -1 })
 
     vim.api.nvim_buf_set_extmark(task.bufnr, ns_id, lnum + 2, 0, {
         virt_lines = { { {  string.rep('-', 255), "CompileLuaSep" } } },
@@ -379,8 +378,8 @@ _M.render_stop_info_comp = function(task, ret_code)
             vim.fn.strftime("%c"), (vim.uv.hrtime() - task.start_time) / 1E9)
     }
 
-    _M.ui_set_lines(task, lnum, lines)
-    _M.ui_set_hl(task, hl_group, { lnum + 1, 12 },
+    _M.set_lines(task, lnum, lines)
+    _M.set_hl(task, hl_group, { lnum + 1, 12 },
         { lnum + 1, 12 + #status })
     -- NOTE: make sure the result line has been drawn before set virtual lines
     _M.flush_cache(task)
@@ -406,6 +405,22 @@ end
 _M.get_dir_extmark_ids = function(bufnr, sp)
     return vim.api.nvim_buf_get_extmarks(bufnr, ns_dir_id, sp , -1,
         { hl_name = false, limit = 1, details = false })
+end
+
+_M.tmp_debug_tabwin = function(lines)
+    vim.cmd("tabnew")
+    local bufnr = vim.api.nvim_get_current_buf()
+    local opts = { buf = bufnr, scope = "local" }
+
+    vim.api.nvim_set_option_value('modeline', false, opts)
+    vim.api.nvim_set_option_value('buftype', "nofile", opts)
+    vim.api.nvim_set_option_value('buflisted', false, opts)
+    vim.api.nvim_set_option_value('bufhidden', "wipe", opts)
+    vim.api.nvim_set_option_value("undolevels", -1, opts)  -- disable undo/redo
+    vim.api.nvim_set_option_value('swapfile', false, opts)
+    vim.api.nvim_set_option_value('filetype', 'compilation_debug', opts)
+
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 end
 
 return _M

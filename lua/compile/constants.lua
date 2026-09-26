@@ -33,6 +33,20 @@ _M.Severity = {
     ERROR = 3,
 }
 
+local _Severity2str = {
+    [_M.Severity.HINT] = "HINT",
+    [_M.Severity.INFO] = "INFO",
+    [_M.Severity.WARNING] = "WARNING",
+    [_M.Severity.ERROR] = "ERROR",
+}
+
+local _str2Severity = {
+    ["HINT"] = _M.Severity.HINT,
+    ["INFO"] = _M.Severity.INFO,
+    ["WARNING"] = _M.Severity.WARNING,
+    ["ERROR"] = _M.Severity.ERROR,
+}
+
 local _Severity2hl = {
     [_M.Severity.HINT] = "CompileLuaHint",
     [_M.Severity.INFO] = "CompileLuaInfo",
@@ -57,6 +71,21 @@ _M.get_valid_severity = function(level)
     end
 
     return _M.Severity.ERROR
+end
+
+--- @param level CompileSeverity | integer
+_M.get_str_by_severity = function(level)
+    level = level or _M.Severity.ERROR
+    return _Severity2str[level] or "ERROR"
+end
+
+--- @return CompileSeverity?
+_M.get_severity_by_str = function(str)
+    return _str2Severity[str]
+end
+
+_M.get_severity_strs = function()
+    return vim.tbl_keys(_str2Severity)
 end
 
 ------------------------------------------------------------------------------

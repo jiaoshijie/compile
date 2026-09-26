@@ -157,6 +157,8 @@ _M.keymap = {
 
         ["<C-r>"] = "recompile",
         ["<C-c>"] = "kill_compilation", -- first send SIGTERM if failed after timeout, send SIGKILL
+        ["I"] = "stdin",
+        ["A"] = "stdin_secret",
     },
     [constants.CompileType.NORMRO] = {
         ["p"] = "display_error",

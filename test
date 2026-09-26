@@ -8,13 +8,19 @@ RUN_TEST_CASE=
 RUN_ALL_TEST=
 NEOVIM_BIN_PATH=${JSJ_NEOVIM_BIN:-$(command -v nvim)}
 
-while getopts "n:a" opt; do
+while getopts "n:al" opt; do
   case "$opt" in
     a)
       RUN_ALL_TEST=1
       ;;
     n)
       NEOVIM_BIN_PATH="$OPTARG"
+      ;;
+    l)
+      for case in tests/cfg/*.lua tests/matchers/*.lua; do
+        echo "$case"
+      done
+      exit 0
       ;;
   esac
 done

@@ -12,14 +12,8 @@ local unique_id = 0
 
 --- @param ctx CompileCtx
 --- @return boolean
-local is_running = function(ctx)
-    return ctx.job_id ~= nil and vim.fn.jobwait({ ctx.job_id }, 0)[1] == -1
-end
-
---- @param ctx CompileCtx
---- @return boolean
 local should_kill = function(ctx)
-    if not is_running(ctx) then return true end
+    if not _M.is_running(ctx) then return true end
 
     local choice = vim.fn.confirm(
         "A compilation process is running, kill it?",
@@ -28,7 +22,7 @@ local should_kill = function(ctx)
     if choice == 2 then return false end
 
     ctx.is_terminated = true
-    if is_running(ctx) then
+    if _M.is_running(ctx) then
         vim.fn.jobstop(ctx.job_id)
     end
     return true
@@ -56,9 +50,11 @@ local init_ctx = function(ctx, cmd, lcfg, work_id)
     -- base class
     ctx.lcfg = refresh_env(lcfg)
 
-    ctx.dir_stack = { vim.fn.expand(get_val("cwd", lcfg) or vim.fn.getcwd()) }
+    local cwd = task_lib.get_cfg_val("cwd", ctx.lcfg) or vim.fn.getcwd()
+    ctx.dir_stack = { kit.unify_path(vim.fn.expand(cwd), true) }
     ctx.dir_stack_arr = {}
     ctx.lookup = {}
+    ctx.debug = nil
     ctx.stat_info = {
         ret_code = nil,
         [constants.Severity.ERROR] = 0,
@@ -66,7 +62,6 @@ local init_ctx = function(ctx, cmd, lcfg, work_id)
         [constants.Severity.INFO] = 0,
         [constants.Severity.WARNING] = 0,
     }
-
     ctx.parse_info = {
         lnum = 0,
         fe_table = {},
@@ -148,7 +143,7 @@ local parse = function(ctx, lines, finished)
     end
     -- 6. put all lines into compilation buffer
     if #lines > 0 then
-        ui.ui_set_lines(ctx, parse_info.lnum, lines)
+        ui.set_lines(ctx, parse_info.lnum, lines)
         local output_inserted_hook = get_val("on_output_inserted_hook_fn", ctx.lcfg)
         if type(output_inserted_hook) == "function" then
             output_inserted_hook(parse_info.lnum, parse_info.lnum + #lines - 1)
@@ -197,6 +192,12 @@ end
 
 ------------------------------------------------------------------------------
 
+--- @param ctx CompileCtx
+--- @return boolean
+_M.is_running = function(ctx)
+    return ctx.job_id ~= nil and vim.fn.jobwait({ ctx.job_id }, 0)[1] == -1
+end
+
 --- @param buf_name string
 --- @return CompileCtx
 _M.new_task = function(bufnr, buf_name)
@@ -234,8 +235,8 @@ _M.run = function(ctx, cmd, lcfg)
 
     local ok, ret = pcall(vim.fn.jobstart, ctx.cmd, {
         pty = true,
-        cwd = ctx.dir_stack[1],
         stdin = "pipe",
+        cwd = ctx.dir_stack[1],
         clear_env = get_val("clear_env", lcfg),
         env = get_val("env", lcfg),
         on_exit = function(_, ret_code, _)
@@ -257,6 +258,7 @@ _M.run = function(ctx, cmd, lcfg)
                 job_finished_hook(ret_code)
             end
             cleanup(ctx)
+            vim.cmd([[redrawstatus!]])
         end,
         on_stdout = function(_, data, _)
             if ctx.is_terminated or work_id ~= ctx.task_id then return end
@@ -296,7 +298,7 @@ _M.run = function(ctx, cmd, lcfg)
 
     ui.render_start_info_comp(ctx)
 
-    if get_val("disable_stdin", ctx.lcfg) then
+    if get_val("close_stdin", ctx.lcfg) then
         vim.fn.chansend(ctx.job_id, string.char(4))
     end
 
@@ -310,7 +312,7 @@ end
 
 --- @param ctx CompileCtx
 _M.stop_task = function(ctx, force)
-    if not is_running(ctx) then return end
+    if not _M.is_running(ctx) then return end
 
     if not force then
         local choice = vim.fn.confirm(

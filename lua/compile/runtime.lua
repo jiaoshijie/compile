@@ -85,6 +85,7 @@ local set_events = function(task)
         end,
     })
 
+    -- TODO: move to tasks
     vim.api.nvim_create_autocmd("BufUnload", {
         buffer = task.bufnr,
         group = ev_group,
@@ -102,6 +103,43 @@ local set_events = function(task)
             end
         end,
     })
+end
+
+local set_user_cmd = function(task)
+    vim.api.nvim_buf_create_user_command(task.bufnr, "CompileSetLevel", function(args)
+        local level_str = args.args
+        local level = constants.get_severity_by_str(level_str)
+
+        if not level and #level_str ~= 0 then
+            kit.echo_err_msg(fmt("Invalid level string: %s", level_str))
+            return
+        end
+
+        action.set_skip_threshold(task, level)
+    end, { nargs = "?", complete = function(_, _, _)
+        return constants.get_severity_strs()
+    end })
+
+    vim.api.nvim_buf_create_user_command(task.bufnr, "CompileDebug", function(args)
+        if args.bang then
+            vim.print(task)
+            return
+        end
+        local content = task[args.args] or task
+
+        if type(content) == "table" then
+            ui.tmp_debug_tabwin(vim.fn.split(vim.inspect(content), '\n'))
+        else
+            vim.print(content)
+        end
+    end, { nargs = "?", bang = true, complete = function(_, _, _)
+        return vim.tbl_keys(task)
+    end })
+end
+
+local unset_user_cmd = function(task)
+    vim.api.nvim_buf_del_user_command(task.bufnr, "CompileSetLevel")
+    vim.api.nvim_buf_del_user_command(task.bufnr, "CompileDebug")
 end
 
 _M.compile = function(cmd, buf_name, lcfg)
@@ -129,6 +167,7 @@ _M.compile = function(cmd, buf_name, lcfg)
         tasks[task.bufnr] = task
         set_keymaps(task)
         set_events(task)
+        set_user_cmd(task)
     end
 
     if task.type ~= constants.CompileType.COMP then
@@ -141,14 +180,6 @@ _M.compile = function(cmd, buf_name, lcfg)
     entry.run(task, cmd, lcfg)
 end
 
-_M.terminal = function(bufnr, lcfg)
-    local _ = bufnr
-    local _ = lcfg
-
-    -- BUG: https://github.com/neovim/neovim/issues/42053
-    kit.echo_err_msg("TERM task is not supported right now.")
-end
-
 _M.norm = function(ro, bufnr, lcfg)
     local typ = ro and constants.CompileType.NORMRO or constants.CompileType.NORMRW
     if not validate_env(typ) then
@@ -158,7 +189,7 @@ _M.norm = function(ro, bufnr, lcfg)
     local task = tasks[bufnr]
 
     if task then -- disable
-        if task.type ~= type then
+        if task.type ~= typ then
             kit.echo_err_msg(fmt("This buffer enabled ohter task."))
             return
         end
@@ -166,21 +197,26 @@ _M.norm = function(ro, bufnr, lcfg)
         entry.cleanup(task)
         unset_keymaps(task)
         unset_events(task)
+        unset_user_cmd(task)
         tasks[bufnr] = nil
     else
         tasks[bufnr] = entry.parse(typ, bufnr, lcfg)
         set_keymaps(tasks[bufnr])
         set_events(tasks[bufnr])
+        set_user_cmd(tasks[bufnr])
     end
 end
 
---- list all the compilation buffers
-_M.ls = function(details)
-    if details then
-        vim.print(tasks)
-        return
-    end
+_M.terminal = function(bufnr, lcfg)
+    local _ = bufnr
+    local _ = lcfg
 
+    -- BUG: https://github.com/neovim/neovim/issues/42053
+    kit.echo_err_msg("TERM task is not supported right now.")
+end
+
+--- list all the compilation buffers
+_M.ls = function()
     -- format: bufnr type bufname
     for _, task in pairs(tasks) do
         print(fmt("%d %s %s", task.bufnr, constants.type2str(task.type),
