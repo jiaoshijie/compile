@@ -201,12 +201,16 @@ end
 
 --- list all the compilation buffers
 _M.ls = function()
-    -- format: bufnr type bufname
+    if #tasks == 0 then
+        print("No task need to be listed")
+        return
+    end
+
+    print("bufnr\ttype\tbufname")
     for _, task in pairs(tasks) do
-        print(fmt("%d %s %s", task.bufnr, constants.type2str(task.type),
+        print(fmt("%d\t%s\t%s", task.bufnr, constants.type2str(task.type),
             vim.fn.bufname(task.bufnr)))
     end
-    print()
 end
 
 _M.statusline = function(winid)
