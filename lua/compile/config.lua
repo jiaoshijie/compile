@@ -94,20 +94,23 @@ _M.on_parse_filename_hook_fn = nil
 _M.on_job_started_hook_fn = nil
 
 --- NOTE: deleting lines is valid in this function
+--- ctx: internal CompileCtx, this function should not modity this ctx directly
 --- lnum(0-based): Line number where lines will be inserted.
 --- lines: Newly received lines that will be parsed later.
---- @type fun(lnum: integer, lines: string[]) : string[]
+--- @type fun(ctx: CompileCtx, lnum: integer, lines: string[]) : string[]
 _M.on_output_hook_fn = nil
 
 --- NOTE: deleting lines is **NOT** allowed in this function
+--- ctx: internal CompileCtx, this function should not modity this ctx directly
 --- lnum(0-based): Line number where lines will be inserted.
 --- lines: Newly received lines that will be parsed later.
---- @type fun(lnum: integer, lines: string[]) : string[]
+--- @type fun(ctx: CompileCtx, lnum: integer, lines: string[]) : string[]
 _M.on_output_parsed_hook_fn = nil
 
 --- must not modify the buffer content
 --- only meant to be used for highlighting something
---- @type fun(b_lnum: integer, e_lnum: integer): nil
+--- ctx: internal CompileCtx, this function should not modity this ctx directly
+--- @type fun(ctx: CompileCtx, b_lnum: integer, e_lnum: integer): nil
 _M.on_output_inserted_hook_fn = nil
 
 --- when the process has been finished

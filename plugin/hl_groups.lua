@@ -8,6 +8,7 @@ local highlights = {
     CompileLuaCol       = { default = true, link = "ColorColumn" },
     CompileLuaLink      = { default = true, underline = true },
     CompileLuaAttention = { default = true, link = "IncSearch" },
+    CompileLuaGrepMatch = { default = true, link = "Label" },
 }
 
 for k, v in pairs(highlights) do

@@ -112,7 +112,7 @@ local parse = function(ctx, lines, finished)
 
     local output_hook = get_val("on_output_hook_fn", ctx.lcfg)
     if type(output_hook) == "function" then
-        lines = output_hook(parse_info.lnum, lines)
+        lines = output_hook(ctx, parse_info.lnum, lines)
     end
 
     task_lib.parse(ctx, lines)
@@ -124,7 +124,7 @@ local parse = function(ctx, lines, finished)
 
     local output_parsed_hook = get_val("on_output_parsed_hook_fn", ctx.lcfg)
     if type(output_parsed_hook) == "function" then
-        local new_lines = output_parsed_hook(parse_info.lnum, lines)
+        local new_lines = output_parsed_hook(ctx, parse_info.lnum, lines)
         if #new_lines == #lines then
             lines = new_lines
         end
@@ -135,7 +135,7 @@ local parse = function(ctx, lines, finished)
         ui.set_lines(ctx, parse_info.lnum, lines)
         local output_inserted_hook = get_val("on_output_inserted_hook_fn", ctx.lcfg)
         if type(output_inserted_hook) == "function" then
-            output_inserted_hook(parse_info.lnum, parse_info.lnum + #lines - 1)
+            output_inserted_hook(ctx, parse_info.lnum, parse_info.lnum + #lines - 1)
         end
         parse_info.lnum = parse_info.lnum + #lines
     end
