@@ -35,7 +35,7 @@ local hl_subm = function(ctx, lnum, line)
         local b2, e2 = string.find(line, '\27[m', e1 + 1, true)
         if b2 == nil then break end  -- Must be impossible
 
-        require("compile.ui").set_hl(ctx, "CompileLuaGrepMatch", { lnum, b1 -c }, { lnum, b2 - c - 4 }, false)
+        require("compile.ui").set_hl(ctx, "CompileLuaGrepMatch", { lnum, b1 - c }, { lnum, b2 - c - 4 }, false)
 
         --- @diagnostic disable-next-line: cast-local-type
         p = e2
