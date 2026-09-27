@@ -73,21 +73,21 @@ _M.setup = function()
 
         require("compile").compile(cmd, "[compilation.grep]", {
             -- matchers
-            matchers = { match = match, context = context },
-            matchers_alist = { "match", "context" },
+            matchers_alist = { match, context },
             directory_matcher = false,
             keyword_matchers = {},
             cmd_cd_matcher = false,
             -- callbacks
             on_output_parsed_hook_fn = output_parsed,
             -- options
+            debug = args.bang,
             error_msg = "match",
             search_whole_directory_stack = false,
             clear_env = true,
             env = { GREP_COLORS="ms=0:mc=:sl=:cx=:fn=:ln=:bn=:se=:ne" },
             close_stdin = true,
         })
-    end, { force = true, nargs = "+", complete = "file" })
+    end, { force = true, nargs = "+", complete = "file", bang = true })
 end
 
 return _M

@@ -113,8 +113,11 @@ local set_user_cmd = function(task)
         else
             vim.print(content)
         end
-    end, { nargs = "?", bang = true, complete = function(_, _, _)
-        return vim.tbl_keys(task)
+    end, { nargs = "?", bang = true, complete = function(arg_lead, _, _)
+        print(arg_lead)
+        return vim.tbl_map(function(item)
+            return vim.startswith(item, arg_lead) and item or nil
+        end, vim.tbl_keys(task))
     end })
 end
 

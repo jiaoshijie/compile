@@ -50,7 +50,7 @@
 --- @field dir_stack string[]?        -- last directory stack snapshot
 --- @field dir_stack_arr DIR_STACK[]?
 --- @field lookup table<integer, MESSAGE>?   -- table<line_number | ext_mark_id, MESSAGE>
---- @field debug table<integer, integer>?    -- table<lnum, index>
+--- @field debug table<integer, integer | string>?    -- table<lnum, index>
 --- @field stat_info StatInfo
 --- @field parse_info ParseInfo?
 
@@ -226,7 +226,7 @@ local new_file_entry = function(ctx, info, idx, file)
     return fe
 end
 
-local set_debug_info = function(ctx, idx, lnum)
+local set_debug_info = function(ctx, id, lnum)
     if ctx.type ~= constants.CompileType.COMP
         and ctx.type ~= constants.CompileType.NORMRO then
         return
@@ -236,7 +236,7 @@ local set_debug_info = function(ctx, idx, lnum)
     if not debug_enabled then return end
 
     ctx.debug = ctx.debug or {}
-    ctx.debug[lnum] = idx
+    ctx.debug[lnum] = id
 end
 
 local get_pos_range = function(cap, multiline, text, lnum)
@@ -329,7 +329,7 @@ local set_msg = function(ctx, loc_id, msg)  -- 1-based index
     ctx.lookup[loc_id] = msg
 end
 
-local parse_error = function(ctx, caps, idx, text, matcher_idx, matcher)
+local parse_error = function(ctx, caps, idx, text, matcher_id, matcher)
     local parse_info = ctx.parse_info
     assert(parse_info)
 
@@ -360,7 +360,7 @@ local parse_error = function(ctx, caps, idx, text, matcher_idx, matcher)
     local lnum1 = get_lnum(parse_info.lnum, idx, true)
     parse_info.last_fe = msg.fe
     ctx.stat_info[msg.type] = ctx.stat_info[msg.type] + 1
-    set_debug_info(ctx, matcher_idx, lnum1)
+    set_debug_info(ctx, matcher_id, lnum1)
 
     local link_id = highlight_error(ctx, caps, matcher, text,
         get_lnum(parse_info.lnum, idx, false))
@@ -389,14 +389,22 @@ local parse_errors = function(ctx, lines)
     local matchers = _M.get_cfg_val("matchers", ctx.lcfg)
     local matchers_alist = _M.get_cfg_val("matchers_alist", ctx.lcfg)
 
-    for matcher_idx, val in ipairs(matchers_alist) do
-        if type(val) ~= "string" then goto skip end
+    for matcher_idx, matcher_val in ipairs(matchers_alist) do
+        local matcher, matcher_id = nil, nil
 
-        local found
-        local matcher = matchers and matchers[val]
-        if not matcher then
-            found, matcher = pcall(require, "compile.matchers." .. val)
-            if not found then goto skip end
+        if type(matcher_val) == "string" then
+            matcher = matchers and matchers[matcher_val]
+            local found
+            if not matcher then
+                found, matcher = pcall(require, "compile.matchers." .. matcher_val)
+                if not found then goto skip end
+            end
+            matcher_id = matcher_val
+        elseif type(matcher_val) == "table" then
+            matcher = matcher_val
+            matcher_id = matcher_idx
+        else
+            goto skip
         end
         assert(type(matcher) == "table")
 
@@ -438,7 +446,7 @@ local parse_errors = function(ctx, lines)
             end
 
             set_matched(parse_info, multiline, lines_idx)
-            parse_error(ctx, caps, lines_idx, text, matcher_idx, matcher)
+            parse_error(ctx, caps, lines_idx, text, matcher_id, matcher)
             lines_idx = lines_idx + multiline
 
             ::continue::

@@ -157,16 +157,16 @@ _M.skip_the_same_location = true
 
 --- NOTE: all below options only affect CompileType.COMP
 
---- @type boolean  -- only affect compile task
+--- @type boolean
 _M.clear_env = false
 
---- @type table? { ["TERM"] = "dumb", ["PAGER"] = "" }  -- only affect compile task
+--- @type table? { ["TERM"] = "dumb", ["PAGER"] = "" }
 _M.env = nil
 
 --- @type boolean
 _M.background = false
 
---- @type boolean  -- only affect compile task
+--- @type boolean
 _M.close_stdin = false
 
 ----------------------------- keymaps ----------------------------------------

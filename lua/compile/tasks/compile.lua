@@ -33,6 +33,7 @@ local refresh_env = function(lcfg)
 
     lcfg.env["TERM"] = "dumb"  -- disable most of control sequences support
     lcfg.env["PAGER"] = ""   -- clear the pager variable, in case some program(git log) will use it
+    lcfg.env["MANPAGER"] = ""   -- clear the pager variable, in case some program(git log) will use it
     if get_val("clear_env", lcfg) then
         lcfg.env["LANG"] = if_nil(lcfg.env["LANG"], "C")
         lcfg.env["LC_ALL"] = if_nil(lcfg.env["LC_ALL"], "C")
