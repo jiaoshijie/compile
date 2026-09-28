@@ -445,9 +445,14 @@ local parse_errors = function(ctx, lines)
             end
 
             if multiline > 1 then
-                if lines_idx + rest <= #lines then
-                    text = table.concat(lines, '\n', lines_idx,
-                        lines_idx + rest)
+                local end_lines_idx = lines_idx + rest
+                if end_lines_idx > #lines and parse_info.eof
+                    and matcher.opt_multiline then
+                    end_lines_idx = #lines
+                end
+
+                if end_lines_idx <= #lines then
+                    text = table.concat(lines, '\n', lines_idx, end_lines_idx)
                     caps = matcher.pattern2:match(text)
                     if not caps then
                         lines_idx = lines_idx + 1
@@ -462,15 +467,14 @@ local parse_errors = function(ctx, lines)
                 end
             end
 
-            set_matched(parse_info, multiline, lines_idx)
             parse_error(ctx, caps, lines_idx, text, matcher_id, matcher)
-
+            local step = multiline
             if matcher.opt_multiline and multiline > 1 then
-                lines_idx = lines_idx + get_matched_line_count(text, caps.e)
-            else
-                lines_idx = lines_idx + multiline
+                step = get_matched_line_count(text, caps.e)
             end
 
+            set_matched(parse_info, step, lines_idx)
+            lines_idx = lines_idx + step
             ::continue::
         end
 

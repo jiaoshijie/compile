@@ -1,3 +1,3 @@
 local lib = require("tests.lib")
 
-lib.single_line_parser("gnu", "gnu.txt")
+lib.single_line_matcher("gnu", "gnu.txt")

@@ -32,7 +32,7 @@ _M.print = function(msg)
     io.stdout:flush()
 end
 
-_M.cfg_pattern = function(pattern, case_filename)
+_M.cfg_pattern = function(matcher, case_filename)
     local case_file = fmt("%s/cases/%s", script_dir, case_filename)
 
     local lines = vim.fn.readfile(case_file)
@@ -45,21 +45,21 @@ _M.cfg_pattern = function(pattern, case_filename)
 
     for i = 1,#test_lines do
         if res_lines[i] == "nil" then
-            is_nil(pattern:match(test_lines[i]))
+            is_nil(matcher:match(test_lines[i]))
         elseif res_lines[i] == "print" then
-            _M.print(vim.json.encode(pattern:match(test_lines[i])))
+            _M.print(vim.json.encode(matcher:match(test_lines[i])))
         elseif res_lines[i] == "number" then
-            is_number(pattern:match(test_lines[i]))
+            is_number(matcher:match(test_lines[i]))
         else
-            eq(pattern:match(test_lines[i]), vim.json.decode(res_lines[i]))
+            eq(matcher:match(test_lines[i]), vim.json.decode(res_lines[i]))
         end
     end
 end
 
-_M.single_line_parser = function(parser_name, case_filename)
+_M.single_line_matcher = function(matcher_name, case_filename)
     local start_time = vim.uv.hrtime()
-    _M.print(fmt("%s ...", parser_name))
-    local parser = require("compile.matchers." .. parser_name)
+    _M.print(fmt("%s ...", matcher_name))
+    local matcher = require("compile.matchers." .. matcher_name)
     local case_file = fmt("%s/cases/%s", script_dir, case_filename)
 
     local lines = vim.fn.readfile(case_file)
@@ -69,31 +69,43 @@ _M.single_line_parser = function(parser_name, case_filename)
     local res_lines = vim.list_slice(lines, res_lnum)
 
     eq(#test_lines, #res_lines)
-    eq(1, parser.multiline)
+    eq(1, matcher.multiline)
 
     local i = 1
 
     while i <= #test_lines do
         if res_lines[i] == "nil" then
-            is_nil(parser.pattern:match(test_lines[i]))
+            is_nil(matcher.pattern:match(test_lines[i]))
         elseif res_lines[i] == "wrong" then
             _M.print(fmt("INFO: An unsupported format: `%s`", test_lines[i]))
         elseif res_lines[i] == "print" then
-            _M.print(vim.json.encode(parser.pattern:match(test_lines[i])))
+            _M.print(vim.json.encode(matcher.pattern:match(test_lines[i])))
         else
-            eq(vim.json.decode(res_lines[i]), parser.pattern:match(test_lines[i]))
+            eq(vim.json.decode(res_lines[i]), matcher.pattern:match(test_lines[i]))
         end
         i = i + 1
     end
 
     _M.print(fmt("%s DONE, duration: %.03fs",
-        parser_name, (vim.uv.hrtime() - start_time) / 1E9))
+        matcher_name, (vim.uv.hrtime() - start_time) / 1E9))
 end
 
-_M.multiline_parser = function(parser_name, case_filename)
+local get_matched_line_count = function(text, end_col)
+    local count = 1
+
+    local np = string.find(text, '\n')
+    while np and end_col > np do
+        count = count + 1
+        np = string.find(text, '\n', np + 1)
+    end
+
+    return count
+end
+
+_M.multiline_matcher = function(matcher_name, case_filename)
     local start_time = vim.uv.hrtime()
-    _M.print(fmt("%s ...", parser_name))
-    local parser = require("compile.matchers." .. parser_name)
+    _M.print(fmt("%s ...", matcher_name))
+    local matcher = require("compile.matchers." .. matcher_name)
     local case_file = fmt("%s/cases/%s", script_dir, case_filename)
 
     local lines = vim.fn.readfile(case_file)
@@ -105,37 +117,48 @@ _M.multiline_parser = function(parser_name, case_filename)
     eq(#test_lines, #res_lines)
 
     local i = 1
-    local rest = parser.multiline - 1
+    local rest = matcher.multiline - 1
 
     while i <= #test_lines do
         if res_lines[i] == "" then
             unreachable()
         elseif res_lines[i] == "nil" then
-            is_nil(parser.pattern:match(test_lines[i]))
+            is_nil(matcher.pattern:match(test_lines[i]))
             i = i + 1
             goto continue
-        elseif res_lines[i] == "number" then
-            is_number(parser.pattern:match(test_lines[i]))
+        elseif res_lines[i] == "number" then  -- only matched pattern1
+            is_number(matcher.pattern:match(test_lines[i]))
             i = i + 1
             goto continue
         end
+        is_number(matcher.pattern:match(test_lines[i]))
 
-        is_number(parser.pattern:match(test_lines[i]))
+        local end_i = i + rest
+        if end_i > #test_lines and matcher.opt_multiline then
+            end_i = #test_lines
+        end
+
+        local text = table.concat(test_lines, '\n', i, end_i)
+        local caps = matcher.pattern2:match(text)
 
         if res_lines[i] == "print" then
-            _M.print(vim.json.encode(
-                parser.pattern2:match(table.concat(test_lines, '\n', i, i + rest))))
+            _M.print(vim.json.encode(caps))
         else
-            eq(vim.json.decode(res_lines[i]),
-                parser.pattern2:match(table.concat(test_lines, '\n', i, i + rest)))
+            eq(vim.json.decode(res_lines[i]), caps)
         end
 
-        i = i + parser.multiline
+        local step = matcher.multiline
+
+        if matcher.opt_multiline then
+            step = get_matched_line_count(text, caps.e)
+        end
+
+        i = i + step
         ::continue::
     end
 
     _M.print(fmt("%s DONE, duration: %.03fs",
-        parser_name, (vim.uv.hrtime() - start_time) / 1E9))
+        matcher_name, (vim.uv.hrtime() - start_time) / 1E9))
 end
 
 return _M

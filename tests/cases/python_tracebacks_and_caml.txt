@@ -6,9 +6,9 @@ Warning: this expression should have type unit.
   File \lib\python\Products\PythonScripts\PythonScript.py, line 302, in _exec
   File "/tmp/foo.py", line 10
 ------------------------------------------------------------------------------
-print
-print
-print
-print
-print
-print
+{"file":{"b":7,"e":16,"c":"foobar.ml"},"b":6,"e":48,"line":{"b":25,"e":26,"c":"5"},"line_end":{"b":27,"e":28,"c":"8"},"col":{"b":41,"e":43,"c":"20"},"col_end":{"b":44,"e":47,"c":"155"}}
+{"file":{"b":7,"e":26,"c":"F:\\ocaml\\sorting.ml"},"b":6,"e":64,"line":{"b":34,"e":36,"c":"65"},"type_hl":{"b":56,"e":63,"hl":"CompileLuaWarning"},"type":2,"col":{"b":49,"e":50,"c":"2"},"col_end":{"b":51,"e":54,"c":"145"}}
+
+{"file":{"b":9,"e":52,"c":"/usr/share/gdesklets/display/TargetGauge.py"},"b":8,"e":63,"line":{"b":60,"e":62,"c":"41"}}
+{"file":{"b":8,"e":58,"c":"\\lib\\python\\Products\\PythonScripts\\PythonScript.py"},"b":8,"e":69,"line":{"b":65,"e":68,"c":"302"}}
+{"file":{"b":9,"e":20,"c":"/tmp/foo.py"},"b":8,"e":30,"line":{"b":28,"e":30,"c":"10"}}

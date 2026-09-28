@@ -7,7 +7,6 @@ local lpeg = vim.lpeg
 local loc = lpeg.locale()
 local P = lpeg.P
 local S = lpeg.S
-local CG = lpeg.Cg
 local CC = lpeg.Cc
 local CT = lpeg.Ct
 
@@ -30,9 +29,16 @@ local line_end = wrapper(_p2, "line_end")
 local col = wrapper(_p2, "col")
 local col_end = wrapper(_p2, "col_end")
 
-local p2 = CT(S" \t" ^ 0 * pos("b") * P"File " * (quoted_file + unquoted_file)
+local p2 = CT(S" \t" ^ 0 * P"File " * pos("b") * (quoted_file + unquoted_file)
             * P", line" * _s * P" " * line * (P"-" * line_end) ^ -1
-            * (P(-1) + P"," * (P" character" * _s * P" " * col * (P"-" * col_end) ^ -1 * P":") ^ -1)
-            * (S" \n" * CG(P"Warning" * CC(level.WARNING), "type") * (P" " * _p2) ^ -1 * P":") ^ -1 * pos("e"))
+            * (P(-1) + P('\n') + P"," * (P" character" * _s * P" " * col * (P"-" * col_end) ^ -1 * P":") ^ -1)
+            * (S" \n" * wrapper(P"Warning" * CC(level.WARNING), "type_hl") * (P" " * _p2) ^ -1 * P":") ^ -1 * pos("e")) / function(t)
+                if t.type_hl then
+                    t.type = t.type_hl.c
+                    t.type_hl.c = nil
+                    t.type_hl.hl = constants.get_hl_by_severity(t.type)
+                end
+                return t
+            end
 
-return { multiline = 2, opt_multiline = true, pattern = p1, pattern2 = p2 }
+return { multiline = 2, opt_multiline = true, pattern = p1, pattern2 = p2, highlights = { "type_hl" } }

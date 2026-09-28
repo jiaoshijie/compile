@@ -1,3 +1,3 @@
 local lib = require("tests.lib")
 
-lib.single_line_parser("gmake", "gmake.txt")
+lib.single_line_matcher("gmake", "gmake.txt")
