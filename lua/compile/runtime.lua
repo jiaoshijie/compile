@@ -201,7 +201,7 @@ end
 
 --- list all the compilation buffers
 _M.ls = function()
-    if #tasks == 0 then
+    if next(tasks) == nil then
         print("No task need to be listed")
         return
     end
