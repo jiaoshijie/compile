@@ -4,5 +4,5 @@ A replica of Emacs compilation mode(compile.el) for neovim
 
 ## TODOs
 
-- [ ] Rg tool needs version checking, (rg must support highlight colors setting)
+- [ ] make tset script use fzf for selecting test item(s)
 - [ ] port useful emacs regexes to lpeg matchers

@@ -19,9 +19,14 @@ _M.matchers = nil
 --- multiline parsers should go first to avoid conflict with single parsers
 --- @type string[]
 _M.matchers_alist = {
-    "rustc",  -- 2
-    "python_tracebacks_and_caml", -- 2 opt
-    "rust_panic", "bash", "gmake", "gnu",  -- 1
+    -- 2
+    "rustc",
+
+    -- 2 opt
+    "python_tracebacks_and_caml",
+
+    -- 1
+    "rust_panic", "bash", "gmake", "gnu", "shellcheck",
 }
 
 --- @alias TranPattern vim.lpeg.Pattern

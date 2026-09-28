@@ -1,0 +1,10 @@
+7
+In autogen.sh line 38:
+autoconf_min=`sed -n 's/^ *AC_PREREQ(\[\([0-9\.]*\)]).*/\1/p' configure.ac`
+^----------^ SC2034: autoconf_min appears unused. Verify use (or export if used externally).
+             ^-- SC2006: Use $(...) notation instead of legacy backticked `...`.
+-------------------------------------------------------------------------------
+{"e":23,"line":{"c":"38","e":22,"b":20},"b":1,"file":{"c":"autogen.sh","e":14,"b":4}}
+nil
+nil
+nil
