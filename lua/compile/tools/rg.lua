@@ -1,3 +1,4 @@
+local kit = require("compile.kit")
 local constants = require("compile.constants")
 local matchers_lib = require("compile.matchers")
 local pos = matchers_lib.pos
@@ -139,6 +140,12 @@ local rg_vimgrep = {
 }
 
 _M.setup = function()
+    local major, _, _ = kit.get_cmd_version('rg', '--version')
+    if major < 15 then
+        kit.echo_info_msg("rg version is less than 15.0.0, then `Rg` will not enabled")
+        return
+    end
+
     vim.api.nvim_create_user_command("Rg", function(args)
         is_vimgrep = _search_vimgrep:match(args.args) ~= nil
         local rg = is_vimgrep and rg_vimgrep or rg_heading

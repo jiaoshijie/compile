@@ -3,12 +3,12 @@ local fmt = string.format
 
 --- @param msg string
 _M.echo_info_msg = function(msg)
-    vim.api.nvim_echo({ { fmt("compile.lua: %s", msg) } }, true, { err = false })
+    vim.api.nvim_echo({ { fmt("compile plugin: %s", msg) } }, true, { err = false })
 end
 
 --- @param msg string
 _M.echo_err_msg = function(msg)
-    vim.api.nvim_echo({ { fmt("compile.lua: %s", msg) } }, true, { err = true })
+    vim.api.nvim_echo({ { fmt("compile plugin: %s", msg) } }, true, { err = true })
 end
 
 _M.if_nil = function(val, default)
@@ -80,6 +80,30 @@ end
 --- @return boolean
 _M.is_absolute_path = function(path)
     return path:sub(1, 1) == "/"
+end
+
+--- @return integer? major
+--- @return integer? minor
+--- @return integer? patch
+_M.get_cmd_version = function(cmd, ver_flag)
+    if vim.fn.executable(cmd) ~= 1 then
+        return nil, nil, nil
+    end
+    local obj = vim.system({ cmd, ver_flag }, {
+        text = true,
+        clear_env = true,
+    }):wait()
+    if obj.code ~= 0 or obj.signal ~= 0
+        or #obj.stderr > 0 then
+        return nil, nil, nil
+    end
+    local major, minor, patch = obj.stdout:match("(%d+)%.(%d+)%.(%d+)")
+
+    if not major or not minor or not patch then
+        return nil, nil, nil
+    end
+
+    return tonumber(major), tonumber(minor), tonumber(patch)
 end
 
 return _M
