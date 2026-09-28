@@ -19,9 +19,11 @@ _M.matchers = nil
 --- multiline parsers should go first to avoid conflict with single parsers
 --- @type string[]
 _M.matchers_alist = {
-    "rustc",  -- 2
+    -- TODO: really do not quite know the order of `2` and `2 opt`.
+    -- Maybe need sometime to figure out which one is suitable.
     "python_tracebacks_and_caml", -- 2 opt
-    "rust_panic", "bash", "gmake", "gnu",  -- 1
+    "rustc",  -- 2
+    -- "rust_panic", "bash", "gmake", "gnu",  -- 1
 }
 
 --- @alias TranPattern vim.lpeg.Pattern

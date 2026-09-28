@@ -31,7 +31,7 @@ local col_end = wrapper(_p2, "col_end")
 
 local p2 = CT(S" \t" ^ 0 * P"File " * pos("b") * (quoted_file + unquoted_file)
             * P", line" * _s * P" " * line * (P"-" * line_end) ^ -1
-            * (P(-1) + P('\n') + P"," * (P" character" * _s * P" " * col * (P"-" * col_end) ^ -1 * P":") ^ -1)
+            * (P(-1) + #P('\n') + P"," * (P" character" * _s * P" " * col * (P"-" * col_end) ^ -1 * P":") ^ -1)
             * (S" \n" * wrapper(P"Warning" * CC(level.WARNING), "type_hl") * (P" " * _p2) ^ -1 * P":") ^ -1 * pos("e")) / function(t)
                 if t.type_hl then
                     t.type = t.type_hl.c
