@@ -432,7 +432,7 @@ local parse_errors = function(ctx, lines)
         while lines_idx <= #lines do
             if skip_mismatched(parse_info, lines_idx) then break end
 
-            if is_matched(parse_info, multiline, lines_idx) then
+            if is_matched(parse_info, 1, lines_idx) then
                 lines_idx = lines_idx + 1
                 goto continue
             end
@@ -467,13 +467,16 @@ local parse_errors = function(ctx, lines)
                 end
             end
 
-            parse_error(ctx, caps, lines_idx, text, matcher_id, matcher)
             local step = multiline
             if matcher.opt_multiline and multiline > 1 then
                 step = get_matched_line_count(text, caps.e)
             end
 
-            set_matched(parse_info, step, lines_idx)
+            if not is_matched(parse_info, step, lines_idx) then
+                parse_error(ctx, caps, lines_idx, text, matcher_id, matcher)
+                set_matched(parse_info, step, lines_idx)
+            end
+
             lines_idx = lines_idx + step
             ::continue::
         end
