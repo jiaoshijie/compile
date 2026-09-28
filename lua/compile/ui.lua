@@ -163,7 +163,7 @@ end
 --- @param task CompileCtx
 --- @param lnum integer
 --- @param line string
-local set_line = function(task, lnum, line)
+_M.set_line = function(task, lnum, line)
     if #task.cache_lines >= constants.ui.cache_size then
         _M.flush_cache(task)
     end
@@ -186,7 +186,7 @@ end
 --- @param lines string[]
 _M.set_lines = function(task, lnum, lines)
     for _, line in ipairs(lines) do
-        set_line(task, lnum, line)
+        _M.set_line(task, lnum, line)
         lnum = lnum + 1
     end
 end

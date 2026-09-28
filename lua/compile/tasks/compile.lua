@@ -227,6 +227,14 @@ local parse_cmd_leading_cd = function(ctx, cmd)
     end
 end
 
+local set_tmporary_line = function(ctx)
+    -- set a temporary line if any
+    if ctx.remain_chunk and #ctx.remain_chunk > 0 then
+        ui.set_line(ctx, ctx.parse_info.lnum, ctx.remain_chunk)
+        ui.flush_cache(ctx) -- require immediately write cached lines to buffer
+    end
+end
+
 ------------------------------------------------------------------------------
 
 --- @param ctx CompileCtx
@@ -312,9 +320,13 @@ _M.run = function(ctx, cmd, lcfg)
 
             ctx.remain_chunk = table.remove(data)
 
-            if #data <= 0 then return end
+            if #data <= 0 then
+                set_tmporary_line(ctx)
+                return
+            end
 
             parse(ctx, data, false)
+            set_tmporary_line(ctx)
         end,
     })
 
