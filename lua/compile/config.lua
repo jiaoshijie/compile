@@ -20,6 +20,7 @@ _M.matchers = nil
 --- @type string[]
 _M.matchers_alist = {
     "rustc",  -- 2
+    "python_tracebacks_and_caml", -- 2 opt
     "rust_panic", "bash", "gmake", "gnu",  -- 1
 }
 

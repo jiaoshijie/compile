@@ -44,6 +44,7 @@
 ---    `pattern` can simply return a number to indicate that line is the potential 'error'.
 ---    In that case `pattern2` is also free to return nil which indicates this is a false positive match.
 --- @class MatcherSpec
+--- @field opt_multiline boolean?
 --- @field multiline integer
 --- @field pattern vim.lpeg.Pattern
 --- @field pattern2 vim.lpeg.Pattern?

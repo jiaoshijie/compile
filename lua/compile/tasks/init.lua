@@ -334,6 +334,18 @@ local get_line_range = function(cap, multiline, text, lnum)
     return sl, el
 end
 
+local get_matched_line_count = function(text, end_col)
+    local count = 1
+
+    local np = string.find(text, '\n')
+    while np and end_col > np do
+        count = count + 1
+        np = string.find(text, '\n', np + 1)
+    end
+
+    return count
+end
+
 local set_msg = function(ctx, loc_id, msg)  -- 1-based index
     ctx.lookup[loc_id] = msg
 end
@@ -452,7 +464,12 @@ local parse_errors = function(ctx, lines)
 
             set_matched(parse_info, multiline, lines_idx)
             parse_error(ctx, caps, lines_idx, text, matcher_id, matcher)
-            lines_idx = lines_idx + multiline
+
+            if matcher.opt_multiline and multiline > 1 then
+                lines_idx = lines_idx + get_matched_line_count(text, caps.e)
+            else
+                lines_idx = lines_idx + multiline
+            end
 
             ::continue::
         end

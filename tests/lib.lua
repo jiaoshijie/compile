@@ -69,7 +69,7 @@ _M.single_line_parser = function(parser_name, case_filename)
     local res_lines = vim.list_slice(lines, res_lnum)
 
     eq(#test_lines, #res_lines)
-    eq(parser.multiline, 1)
+    eq(1, parser.multiline)
 
     local i = 1
 
