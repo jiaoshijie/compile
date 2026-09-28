@@ -38,8 +38,8 @@ local only_pos = {
     multiline = 1,
     pattern = CT(pos("b") * _line * P":" * (_col * P":") ^ -1 * pos("e")) / function(t)
         t.match = {
-            b = t.b,
-            e = t.e,
+            b = t.line.b,
+            e = t.line.e,
             hl = "CompileLuaError",
         }
         return t
