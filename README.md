@@ -4,5 +4,5 @@ A replica of Emacs compilation mode(compile.el) for neovim
 
 ## TODOs
 
-- [ ] if the matched line does not contain a `file`, how to find the last matched file
+- [ ] Rg tool needs version checking, (rg must support highlight colors setting)
 - [ ] port useful emacs regexes to lpeg matchers

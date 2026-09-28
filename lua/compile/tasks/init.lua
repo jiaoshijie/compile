@@ -30,7 +30,6 @@
 --- @class ParseInfo
 --- @field lnum integer 0-based      -- line number
 --- @field fe_table table?
---- @field last_fe FILE_ENTRY?
 --- @field mismatched_index integer?
 --- @field matched table<integer, boolean> table<index, boolean>
 --- @field eof boolean end of file
@@ -199,6 +198,7 @@ local parse_transform_file_matchers = function(ctx, file)
     return false, file
 end
 
+--- @return FILE_ENTRY
 local new_file_entry = function(ctx, info, idx, file)
     file = kit.normalize_path_no_env(file)
 
@@ -224,6 +224,15 @@ local new_file_entry = function(ctx, info, idx, file)
         fe = info.fe_table[dir_path][file]
     end
     return fe
+end
+
+--- @return FILE_ENTRY
+local new_unknow_file_entry = function(ctx, lnum)
+    local dir_stack = _M.get_dir_stack(ctx, lnum)
+    return {
+        dname = dir_stack[#dir_stack],
+        fname = "Unknown",
+    }
 end
 
 local set_debug_info = function(ctx, id, lnum)
@@ -334,7 +343,6 @@ local parse_error = function(ctx, caps, idx, text, matcher_id, matcher)
     assert(parse_info)
 
     local file = get_value_from_txt_capture(caps, matcher, "file", true)
-    local fe = nil
     if file then
         local ignore
         ignore, file = parse_transform_file_matchers(ctx, file)
@@ -344,12 +352,10 @@ local parse_error = function(ctx, caps, idx, text, matcher_id, matcher)
         if type(parse_filename_hook) == "function" then
             file = parse_filename_hook(file)
         end
-    else
-        fe = parse_info.last_fe
     end
 
     local msg = {
-        fe = fe or new_file_entry(ctx, parse_info, idx, file or "unknown"),
+        fe = file and new_file_entry(ctx, parse_info, idx, file) or nil,
         type = constants.get_valid_severity(caps.type),
         line = get_value_from_txt_capture(caps, matcher, "line"),
         col = get_value_from_txt_capture(caps, matcher, "col"),
@@ -358,7 +364,6 @@ local parse_error = function(ctx, caps, idx, text, matcher_id, matcher)
     }
 
     local lnum1 = get_lnum(parse_info.lnum, idx, true)
-    parse_info.last_fe = msg.fe
     ctx.stat_info[msg.type] = ctx.stat_info[msg.type] + 1
     set_debug_info(ctx, matcher_id, lnum1)
 
@@ -493,6 +498,20 @@ local parse_keywords = function(ctx, lines)
     end
 end
 
+--- @param ctx TaskCtx
+--- @param lnum integer 1-based index
+local get_msg = function(ctx, lnum)
+    if ctx.type == constants.CompileType.NORMRW then
+        local ids = ui.get_link_extmark_ids(ctx.bufnr, { lnum - 1, -1 },
+            { lnum - 1, 0 })
+        if #ids == 0 then return nil end
+
+        return ctx.lookup[ids[1][1]]
+    else
+        return ctx.lookup[lnum]
+    end
+end
+
 -------------------------- export apis ---------------------------------------
 
 --- @param key string
@@ -509,15 +528,26 @@ end
 --- @param ctx TaskCtx
 --- @param lnum integer 1-based index
 _M.get_msg = function(ctx, lnum)
-    if ctx.type == constants.CompileType.NORMRW then
-        local ids = ui.get_link_extmark_ids(ctx.bufnr, { lnum - 1, -1 },
-            { lnum - 1, 0 })
-        if #ids == 0 then return nil end
-
-        return ctx.lookup[ids[1][1]]
-    else
-        return ctx.lookup[lnum]
+    local msg = get_msg(ctx, lnum)
+    if not msg or msg.fe then
+        return msg
     end
+    local prev_lnum = lnum - 1
+
+    while prev_lnum >= 1 do
+        local prev_msg = get_msg(ctx, prev_lnum)
+        if prev_msg and prev_msg.fe then
+            -- TODO: deepcopy it?
+            msg.fe = prev_msg.fe
+            break
+        end
+        prev_lnum = prev_lnum - 1
+    end
+
+    if msg.fe then return msg end
+
+    msg.fe = new_unknow_file_entry(ctx, lnum)
+    return msg
 end
 
 --- @param ctx TaskCtx
@@ -567,7 +597,6 @@ _M.init_base_ctx = function(ctx)
     ctx.parse_info = {
         lnum = 0,
         fe_table = {},
-        last_fe = nil,
         mismatched_index = nil,
         matched = {},
         eof = false,
