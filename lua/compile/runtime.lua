@@ -202,15 +202,15 @@ end
 --- list all the compilation buffers
 _M.ls = function()
     if next(tasks) == nil then
-        print("No task need to be listed")
+        kit.echo_info_msg("No task need to be listed")
         return
     end
 
-    print("bufnr\ttype\tbufname")
+    local msg = "bufnr\ttype\tbufname"
     for _, task in pairs(tasks) do
-        print(fmt("%d\t%s\t%s", task.bufnr, constants.type2str(task.type),
-            vim.fn.bufname(task.bufnr)))
+        msg = fmt("%s\n%d\t%s\t%s", msg, task.bufnr, constants.type2str(task.type), vim.fn.bufname(task.bufnr))
     end
+    vim.api.nvim_echo({ { msg } }, false, {})
 end
 
 _M.statusline = function(winid)
