@@ -1,0 +1,26 @@
+15
+CMake Error at CMakeLists.txt:19 (hurz):
+  Unknown CMake command "hurz".
+CMake Warning at cmake/modules/UseUG.cmake:73 (find_package):
+  Could not find a package configuration file provided by "UG" (requested
+  version 3.11.0) with any of the following names:
+
+    UGConfig.cmake
+    ug-config.cmake
+
+  Add the installation prefix of "UG" to CMAKE_PREFIX_PATH or set "UG_DIR" to
+  a directory containing one of the above files.  If "UG" provides a separate
+  development package or SDK, be sure it has been installed.
+------------------------------------------------------------------------------
+{"file":{"e":30,"b":16,"c":"CMakeLists.txt"},"e":41,"type_hl":{"e":12,"hl":"CompileLuaError","b":7},"type":3,"line":{"e":33,"b":31,"c":"19"},"b":1}
+nil
+{"file":{"e":43,"b":18,"c":"cmake/modules/UseUG.cmake"},"e":62,"type_hl":{"e":14,"hl":"CompileLuaWarning","b":7},"type":2,"line":{"e":46,"b":44,"c":"73"},"b":1}
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil
+nil

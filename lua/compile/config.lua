@@ -26,7 +26,7 @@ _M.matchers_alist = {
     "python_tracebacks_and_caml",
 
     -- 1
-    "rust_panic", "bash", "gmake", "gnu", "shellcheck",
+    "cmake", "rust_panic", "bash", "gmake", "gnu", "shellcheck",
 }
 
 --- @alias TranPattern vim.lpeg.Pattern
