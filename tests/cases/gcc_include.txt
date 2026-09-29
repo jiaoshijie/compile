@@ -1,0 +1,24 @@
+14
+The last file, i.e. the one you are compiling, is the interesting one.
+
+In file included from /usr/include/c++/3.3/backward/warn.h:4,
+                 from /usr/include/c++/3.3/backward/iostream.h:31:0,
+                 from test_clt.cc:1:
+In file included from b.h:2,
+                 from a.h:1,
+                 from main.c:1:
+c.h:2:2: error: #error "not supported"
+    2 | #error "not supported"
+      |  ^~~~~
+------------------------------------------------------------------------------
+nil
+nil
+{"type":1,"file":{"e":59,"b":23,"c":"/usr/include/c++/3.3/backward/warn.h"},"e":62,"line":{"e":61,"b":60,"c":"4"},"b":1}
+{"type":1,"file":{"e":63,"b":23,"c":"/usr/include/c++/3.3/backward/iostream.h"},"col":{"e":68,"b":67,"c":"0"},"e":69,"line":{"e":66,"b":64,"c":"31"},"b":1}
+{"type":1,"file":{"e":34,"b":23,"c":"test_clt.cc"},"e":37,"line":{"e":36,"b":35,"c":"1"},"b":1}
+{"type":1,"file":{"e":26,"b":23,"c":"b.h"},"e":29,"line":{"e":28,"b":27,"c":"2"},"b":1}
+{"type":1,"file":{"e":26,"b":23,"c":"a.h"},"e":29,"line":{"e":28,"b":27,"c":"1"},"b":1}
+{"type":1,"file":{"e":29,"b":23,"c":"main.c"},"e":32,"line":{"e":31,"b":30,"c":"1"},"b":1}
+nil
+nil
+nil
