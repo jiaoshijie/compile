@@ -2,7 +2,12 @@
 
 SCRIPT_DIR=$(dirname "$0")
 
-cd "$SCRIPT_DIR"
+fatal() {
+  echo -e "${RED}FATAL_ERROR${RESET}: $*"
+  exit 1
+}
+
+cd "$SCRIPT_DIR" || fatal "cd failed"
 
 RUN_ALL_TEST=
 RUN_LIST=
@@ -46,9 +51,10 @@ all_test() {
 }
 
 list() {
-  local all_cases=$(find tests/cfg/ tests/matchers/ -type f -name '*.lua')
+  local all_cases
   local case
 
+  all_cases=$(find tests/cfg/ tests/matchers/ -type f -name '*.lua')
   if _have fzf; then
     printf "%s" "$all_cases" | fzf --multi |\
       while IFS= read -r case; do
@@ -75,8 +81,12 @@ main() {
       l)
         RUN_LIST=1
         ;;
+      *)
+        exit 1
+        ;;
     esac
   done
+
   shift $((OPTIND - 1))
   [[ -x "$NEOVIM_BIN_PATH" ]] || fatal "No neovim binary file found"
 
