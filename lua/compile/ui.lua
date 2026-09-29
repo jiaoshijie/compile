@@ -130,6 +130,7 @@ _M.display_com_win = function(bufnr)
     for _, win in ipairs(wins) do
         if win ~= cur_winid and kit.is_valid_target_winid2(win) then
             vim.api.nvim_win_set_buf(win, bufnr)
+            vim.fn.win_gotoid(win)
             return win
         end
     end

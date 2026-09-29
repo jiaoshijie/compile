@@ -50,8 +50,16 @@ local only_pos = {
 }
 local only_pos_content = {
     multiline = 1,
-    pattern = CT(pos("b") * _line * P"-" * pos("e") * _hint),
+    pattern = CT(pos("b") * _line * P"-" * pos("e") * _hint) / function(t)
+        t.match = {
+            b = t.line.b,
+            e = t.line.e,
+            hl = "CompileLuaHint",
+        }
+        return t
+    end,
     file = false,
+    highlights = { "match" }
 }
 
 local match = {
@@ -133,7 +141,7 @@ local cfg_path = fmt("%s%s", script_dir, ".res/ripgreprc")
 
 local rg_heading = {
     args = "--colors 'path:fg:black'",
-    matchers_alist = { only_pos, only_pos_content, only_file },
+    matchers_alist = { only_file, only_pos, only_pos_content },
 }
 
 local rg_vimgrep = {

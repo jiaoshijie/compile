@@ -1,13 +1,16 @@
 local kit = require("compile.kit")
+local constants = require("compile.constants")
 local matchers_lib = require("compile.matchers")
 local pos = matchers_lib.pos
 local wrapper = matchers_lib.wrapper
-local fmt = string.format
 local P = vim.lpeg.P
 local S = vim.lpeg.S
 local CG = vim.lpeg.Cg
 local CT = vim.lpeg.Ct
 local LOC = vim.lpeg.locale()
+local fmt = string.format
+
+local is_heading = false
 
 local _d = LOC.digit ^ 1
 local _file = wrapper((P(1) - #P"\0") ^ 1, "file")
@@ -23,6 +26,38 @@ local null = {
     pattern = CT(pos("b") * _file * P"\0" * _line * P"\0" * (_col * P"\0") ^ -1 * pos("e")
         * (P(1) - #ansi_pattern) ^ 0 * CG(ansi_pattern, "type")),
 }
+
+local end_ansi_pattern = P"\27[m" * P(-1)
+local _heading_file = wrapper((P(1) - #end_ansi_pattern) ^ 1, "file")
+local heading_file = {
+    multiline = 1,
+    pattern = CT(P"\27[32m" * _heading_file * end_ansi_pattern) / function(t)
+        t.file.b = t.file.b - 5
+        t.file.e = t.file.e - 5
+        t.b = t.file.b
+        t.e = t.file.e
+        t.type = constants.Severity.INFO
+        return t
+    end,
+}
+
+local heading_pos = {
+    multiline = 1,
+    pattern = CT(pos("b") * _line * P"\0" * (_col * P"\0") ^ -1 * pos("e")
+        * (P(1) - #ansi_pattern) ^ 0 * CG(ansi_pattern, "type")) / function(t)
+            t.match = {
+                b = t.line.b,
+                e = t.line.e,
+                hl = constants.get_hl_by_severity(t.type),
+            }
+            return t
+        end,
+    file = false,
+    highlights = { "match" }
+}
+
+local _heading = P"--heading"
+local _search_heading = (P(1) - #_heading) ^ 0 * _heading
 
 ------------------------------------------------------------------------------
 
@@ -49,17 +84,20 @@ local output_parsed = function(ctx, lnum, lines)
 
     while idx <= #lines do
         local line = lines[idx]
+
         local symbol = _symbols[_search:match(line)]
-        local limit = 2
-
-        if not symbol then goto continue end
-
-        if symbol == ":" then
-            hl_subm(ctx, lnum + idx, line)
-            limit = 3
+        if symbol then
+            local limit = 2
+            if symbol == ":" then
+                hl_subm(ctx, lnum + idx, line)
+                limit = 3
+            end
+            -- NOTE: %z to match NUL character
+            lines[idx] = line:gsub("\27%[[013]-m", ""):gsub("%z", symbol, limit)
+        else
+            lines[idx] = line:gsub("\27%[[23]-m", "")
+            goto continue
         end
-        -- NOTE: %z to match NUL character
-        lines[idx] = line:gsub("\27%[[013]-m", ""):gsub("%z", symbol, limit)
 
         ::continue::
         idx = idx + 1
@@ -72,13 +110,25 @@ end
 
 local _M = {}
 
+local ggrep_heading = {
+    hl_filename = "2",
+    matchers_alist = { heading_file, heading_pos },
+}
+
+local ggrep_vimgrep = {
+    hl_filename = "",
+    matchers_alist = { null },
+}
+
 _M.create_user_command = function(cmd_name)
     local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
         local cmd = fmt("git grep -zHIn --column --color=always %s", args.args)
+        is_heading = _search_heading:match(args.args) ~= nil
+        local ggrep = is_heading and ggrep_heading or ggrep_vimgrep
 
         require("compile").compile(cmd, "[compilation.git_grep]", {
             -- matchers
-            matchers_alist = { null },
+            matchers_alist = ggrep.matchers_alist,
             directory_matcher = false,
             keyword_matchers = {},
             cmd_cd_matcher = false,
@@ -95,7 +145,7 @@ _M.create_user_command = function(cmd_name)
                 GIT_CONFIG_KEY_0="color.grep.context",
                 GIT_CONFIG_VALUE_0="0",
                 GIT_CONFIG_KEY_1="color.grep.filename",
-                GIT_CONFIG_VALUE_1="",
+                GIT_CONFIG_VALUE_1=ggrep.hl_filename,
                 GIT_CONFIG_KEY_2="color.grep.function",
                 GIT_CONFIG_VALUE_2="1",
                 GIT_CONFIG_KEY_3="color.grep.lineNumber",
