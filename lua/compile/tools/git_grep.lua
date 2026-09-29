@@ -1,3 +1,4 @@
+local kit = require("compile.kit")
 local matchers_lib = require("compile.matchers")
 local pos = matchers_lib.pos
 local wrapper = matchers_lib.wrapper
@@ -71,8 +72,8 @@ end
 
 local _M = {}
 
-_M.setup = function()
-    vim.api.nvim_create_user_command("GGrep", function(args)
+_M.create_user_command = function(cmd_name)
+    local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
         local cmd = fmt("git grep -zHIn --column --color=always %s", args.args)
 
         require("compile").compile(cmd, "[compilation.git_grep]", {
@@ -113,6 +114,10 @@ _M.setup = function()
             close_stdin = true,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
+
+    if not ok and type(reason) == "string" then
+        kit.echo_info_msg(reason)
+    end
 end
 
 return _M

@@ -1,3 +1,4 @@
+local kit = require("compile.kit")
 local constants = require("compile.constants")
 local matchers_lib = require("compile.matchers")
 local pos = matchers_lib.pos
@@ -67,9 +68,9 @@ end
 
 local _M = {}
 
-_M.setup = function()
-    vim.api.nvim_create_user_command("Grep", function(args)
-        local cmd = fmt("grep -ZHIn --color=always --exclude-dir=.git %s", args.args)
+_M.create_user_command = function(cmd_name)
+    local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
+        local cmd = fmt("grep -ZHInr --color=always --exclude-dir=.git %s", args.args)
 
         require("compile").compile(cmd, "[compilation.grep]", {
             -- matchers
@@ -88,6 +89,10 @@ _M.setup = function()
             close_stdin = true,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
+
+    if not ok and type(reason) == "string" then
+        kit.echo_info_msg(reason)
+    end
 end
 
 return _M

@@ -141,14 +141,14 @@ local rg_vimgrep = {
     matchers_alist = { match, context },
 }
 
-_M.setup = function()
+_M.create_user_command = function(cmd_name)
     local major, _, _ = kit.get_cmd_version('rg', '--version')
     if major < 15 then
         kit.echo_info_msg("rg version is less than 15.0.0, then `Rg` will not enabled")
         return
     end
 
-    vim.api.nvim_create_user_command("Rg", function(args)
+    local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
         is_vimgrep = _search_vimgrep:match(args.args) ~= nil
         local rg = is_vimgrep and rg_vimgrep or rg_heading
 
@@ -172,6 +172,10 @@ _M.setup = function()
             close_stdin = true,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
+
+    if not ok and type(reason) == "string" then
+        kit.echo_info_msg(reason)
+    end
 end
 
 return _M
