@@ -4,30 +4,9 @@ SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR"
 
-RUN_TEST_CASE=
 RUN_ALL_TEST=
+RUN_LIST=
 NEOVIM_BIN_PATH=${JSJ_NEOVIM_BIN:-$(command -v nvim)}
-
-while getopts "n:al" opt; do
-  case "$opt" in
-    a)
-      RUN_ALL_TEST=1
-      ;;
-    n)
-      NEOVIM_BIN_PATH="$OPTARG"
-      ;;
-    l)
-      for case in tests/cfg/*.lua tests/matchers/*.lua; do
-        echo "$case"
-      done
-      exit 0
-      ;;
-  esac
-done
-
-shift $((OPTIND - 1))
-
-RUN_TEST_CASE="$*"
 
 if [[ "$TERM" == "dumb" ]]; then
   RED='\e[1;31m'
@@ -37,13 +16,15 @@ else
   RESET=
 fi
 
+_have() { type "$1" &>/dev/null; }
+
 fatal() {
   echo -e "${RED}FATAL_ERROR${RESET}: $*"
   exit 1
 }
 
 single_test() {
-  local test_case=${1:-$RUN_TEST_CASE}
+  local test_case=${1:-}
   [[ -z "$test_case" ]] && fatal "No test case specified"
   [[ -f "$test_case" ]] || fatal "test case ($test_case) not found"
 
@@ -51,6 +32,8 @@ single_test() {
 }
 
 all_test() {
+  local case
+
   shopt -s nullglob
 
   for case in tests/cfg/*.lua tests/matchers/*.lua; do
@@ -62,8 +45,46 @@ all_test() {
   exit 0
 }
 
-[[ -x "$NEOVIM_BIN_PATH" ]] || fatal "No neovim binary file found"
+list() {
+  local all_cases=$(find tests/cfg/ tests/matchers/ -type f -name '*.lua')
+  local case
 
-[[ -n "$RUN_ALL_TEST" ]] && all_test
+  if _have fzf; then
+    printf "%s" "$all_cases" | fzf --multi |\
+      while IFS= read -r case; do
+        echo "--------------------------------------------------------------------"
+        single_test "$case" || exit 1
+        echo "--------------------------------------------------------------------"
+      done
+  else
+    echo "$all_cases"
+  fi
 
-single_test
+  exit 0
+}
+
+main() {
+  while getopts "n:al" opt; do
+    case "$opt" in
+      a)
+        RUN_ALL_TEST=1
+        ;;
+      n)
+        NEOVIM_BIN_PATH="$OPTARG"
+        ;;
+      l)
+        RUN_LIST=1
+        ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+  [[ -x "$NEOVIM_BIN_PATH" ]] || fatal "No neovim binary file found"
+
+  [[ -n "$RUN_ALL_TEST" ]] && all_test
+
+  [[ -n "$RUN_LIST" ]] && list
+
+  single_test "$*"
+}
+
+main "$@"
