@@ -1,0 +1,14 @@
+9
+In file included from main.c:1:
+In file included from ./a.h:1:
+./b.h:1:2: error: "not supported"
+#error "not supported"
+ ^
+1 error generated.
+------------------------------------------------------------------------------
+{"file":{"b":23,"c":"main.c","e":29},"type":1,"b":1,"e":32,"line":{"b":30,"c":"1","e":31}}
+{"file":{"b":23,"c":"./a.h","e":28},"type":1,"b":1,"e":31,"line":{"b":29,"c":"1","e":30}}
+nil
+nil
+nil
+nil
