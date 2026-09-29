@@ -45,11 +45,13 @@ local only_pos = {
         }
         return t
     end,
+    file = false,
     highlights = { "match" }
 }
 local only_pos_content = {
     multiline = 1,
-    pattern = CT(pos("b") * _line * P"-" * pos("e") * _hint)
+    pattern = CT(pos("b") * _line * P"-" * pos("e") * _hint),
+    file = false,
 }
 
 local match = {

@@ -364,6 +364,8 @@ local parse_error = function(ctx, caps, idx, text, matcher_id, matcher)
         if type(parse_filename_hook) == "function" then
             file = parse_filename_hook(file)
         end
+    elseif matcher.file ~= false then
+        return
     end
 
     local msg = {

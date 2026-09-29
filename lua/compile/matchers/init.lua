@@ -48,7 +48,7 @@
 --- @field multiline integer
 --- @field pattern vim.lpeg.Pattern
 --- @field pattern2 vim.lpeg.Pattern?
---- @field file FileHandle?
+--- @field file FileHandle | false | nil  -- when it is false means that this matcher doesn't contain filename. Its filename is gotten from the last match that contains filename.
 --- @field line LineColHandle?
 --- @field col LineColHandle?
 --- @field line_end LineColHandle?
