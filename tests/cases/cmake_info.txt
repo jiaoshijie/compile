@@ -1,0 +1,12 @@
+8
+Call Stack (most recent call first):
+  cmake/modules/DuneGridMacros.cmake:19 (include)
+  /home/joe/Project/EXA-DUNE/patches/dune-common/cmake/modules/DuneMacros.cmake:556 (include)
+  /home/joe/Project/EXA-DUNE/patches/dune-common/cmake/modules/DuneMacros.cmake:694 (dune_process_dependency_macros)
+  CMakeLists.txt:22 (dune_project)
+------------------------------------------------------------------------------
+nil
+{"type":1,"b":3,"file":{"e":37,"b":3,"c":"cmake/modules/DuneGridMacros.cmake"},"e":50,"line":{"e":40,"b":38,"c":"19"}}
+{"type":1,"b":3,"file":{"e":80,"b":3,"c":"/home/joe/Project/EXA-DUNE/patches/dune-common/cmake/modules/DuneMacros.cmake"},"e":94,"line":{"e":84,"b":81,"c":"556"}}
+{"type":1,"b":3,"file":{"e":80,"b":3,"c":"/home/joe/Project/EXA-DUNE/patches/dune-common/cmake/modules/DuneMacros.cmake"},"e":117,"line":{"e":84,"b":81,"c":"694"}}
+{"type":1,"b":3,"file":{"e":17,"b":3,"c":"CMakeLists.txt"},"e":35,"line":{"e":20,"b":18,"c":"22"}}
