@@ -13,18 +13,13 @@ local line = wrapper(loc.digit ^ 1, "line")
 local col = wrapper(loc.digit ^ 1, "col")
 local location = ":" * line * ":" * col * ":" * _eos
 local file = wrapper((P(1) - #location) ^ 1, "file")
-local _link = file * location
-local link = pos("t_b") * _link * pos("t_e")
 
 local space4 = P" " * P" " * P" " * P" "
 
 local _p = P"' " * (P"(" * loc.digit ^ 1 * P") ") ^ -1
-    * hl_wrapper(P"panicked", "CompileLuaError", "panic") * P" at " * link
+    * hl_wrapper(P"panicked", "CompileLuaError", "panic") * P" at " * file * location
 local p = CT(pos("b") * space4 ^ -1 * P"thread '" * (P(1) - #_p) ^ 1 * _p * pos("e")) / function(t)
-    t.link = { b = t.t_b, e = t.t_e }
-    t.t_b = nil
-    t.t_e = nil
-
+    t.link = { b = t.file.b, e = t.col.e }
     return t
 end
 

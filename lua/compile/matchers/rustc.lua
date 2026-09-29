@@ -22,14 +22,9 @@ local line = wrapper(loc.digit ^ 1, "line")
 local col = wrapper(loc.digit ^ 1, "col")
 local location = ":" * line * ":" * col * _eos
 local file = wrapper((P(1) - #location) ^ 1, "file")
-local _link = file * location
-local link = pos("t_b") * _link * pos("t_e")
 local p1 = typ_raw
-local p2 = CT(pos("b") * typ * ":" * _any_nl ^ 1 * '\n --> ' * link * pos("e")) / function(t)
-    t.link = { b = t.t_b, e = t.t_e }
-    t.t_b = nil
-    t.t_e = nil
-
+local p2 = CT(pos("b") * typ * ":" * _any_nl ^ 1 * '\n --> ' * file * location * pos("e")) / function(t)
+    t.link = { b = t.file.b, e = t.col.e }
     t.type = t.type_hl.c
     t.type_hl.c = nil
     t.type_hl.hl = constants.get_hl_by_severity(t.type)

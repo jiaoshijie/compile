@@ -19,6 +19,9 @@ _M.matchers = nil
 --- multiline parsers should go first to avoid conflict with single parsers
 --- @type string[]
 _M.matchers_alist = {
+    -- 3
+    "lua",
+
     -- 2
     "rustc",
 
@@ -27,7 +30,7 @@ _M.matchers_alist = {
 
     -- 1
     "bash", "cmake", "cmake_info", "clang_include", "gcc_include", "rust_panic",
-    "lua", "lua_stack", "gmake", "gnu", "perl", "shellcheck",
+    "lua_stack", "gmake", "gnu", "perl", "shellcheck",
 }
 
 --- @alias TranPattern vim.lpeg.Pattern

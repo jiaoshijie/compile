@@ -1,0 +1,24 @@
+14
+* Lua 5.1, 5.2, 5.3, 5.4, and LuaJIT 2.1
+
+/usr/bin/lua: database.lua:31: assertion failed!
+stack traceback:
+	[C]: in function 'assert'
+	database.lua:31: in field 'statement'
+	database.lua:42: in field 'table'
+	database.lua:55: in field 'row'
+	database.lua:63: in field 'value'
+	io.lua: in main chunk
+	[C]: in ?
+------------------------------------------------------------------------------
+nil
+nil
+{"e":68,"link":{"e":30,"b":15},"file":{"c":"database.lua","e":27,"b":15},"line":{"c":"31","e":30,"b":28},"b":1}
+
+
+nil
+nil
+nil
+nil
+nil
+nil

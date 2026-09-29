@@ -2,5 +2,5 @@
 thread 'main' (1234) panicked at library/std/src/io/stdio.rs:30:40:
     thread 'main' (1234) panicked at library/std/src/io/stdio.rs:50:60:
 ------------------------------------------------------------------------------
-{"link":{"e":68,"b":34},"file":{"c":"library/std/src/io/stdio.rs","e":61,"b":34},"b":1,"panic":{"e":30,"hl":"CompileLuaError","b":22},"e":68,"line":{"c":"30","e":64,"b":62},"col":{"c":"40","e":67,"b":65}}
-{"link":{"e":72,"b":38},"file":{"c":"library/std/src/io/stdio.rs","e":65,"b":38},"b":1,"panic":{"e":34,"hl":"CompileLuaError","b":26},"e":72,"line":{"c":"50","e":68,"b":66},"col":{"c":"60","e":71,"b":69}}
+{"link":{"e":67,"b":34},"file":{"c":"library/std/src/io/stdio.rs","e":61,"b":34},"b":1,"panic":{"e":30,"hl":"CompileLuaError","b":22},"e":68,"line":{"c":"30","e":64,"b":62},"col":{"c":"40","e":67,"b":65}}
+{"link":{"e":71,"b":38},"file":{"c":"library/std/src/io/stdio.rs","e":65,"b":38},"b":1,"panic":{"e":34,"hl":"CompileLuaError","b":26},"e":72,"line":{"c":"50","e":68,"b":66},"col":{"c":"60","e":71,"b":69}}
