@@ -1,0 +1,24 @@
+14
+* Lua 5.1, 5.2, 5.3, 5.4, and LuaJIT 2.1
+
+/usr/bin/lua: database.lua:31: assertion failed!
+stack traceback:
+	[C]: in function 'assert'
+	database.lua:31: in field 'statement'
+	database.lua:42: in field 'table'
+	database.lua:55: in field 'row'
+	database.lua:63: in field 'value'
+	io.lua: in main chunk
+	[C]: in ?
+------------------------------------------------------------------------------
+nil
+nil
+nil
+nil
+{"e":10,"b":2,"type":1}
+{"line":{"e":17,"b":15,"c":"31"},"file":{"e":14,"b":2,"c":"database.lua"},"e":22,"b":2,"type":1,"link":{"e":17,"b":2}}
+{"line":{"e":17,"b":15,"c":"42"},"file":{"e":14,"b":2,"c":"database.lua"},"e":22,"b":2,"type":1,"link":{"e":17,"b":2}}
+{"line":{"e":17,"b":15,"c":"55"},"file":{"e":14,"b":2,"c":"database.lua"},"e":22,"b":2,"type":1,"link":{"e":17,"b":2}}
+{"line":{"e":17,"b":15,"c":"63"},"file":{"e":14,"b":2,"c":"database.lua"},"e":22,"b":2,"type":1,"link":{"e":17,"b":2}}
+{"file":{"e":8,"b":2,"c":"io.lua"},"e":13,"b":2,"type":1,"link":{"e":8,"b":2}}
+{"e":10,"b":2,"type":1}
