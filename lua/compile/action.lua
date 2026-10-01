@@ -342,11 +342,28 @@ end
 _M.set_skip_threshold = function(ctx, level)
     if type(level) ~= "number" then
         level = get_val("skip_threshold", ctx.lcfg)
-        print(constants.get_str_by_severity(level))
+        kit.echo_info_msg(fmt("Current skip_threshold value is %s",
+            constants.get_str_by_severity(level)))
         return
     end
 
     ctx.lcfg.skip_threshold = constants.get_valid_severity(level)
+end
+
+--- @param limit integer?
+_M.set_compile_lines_limit = function(ctx, limit)
+    if limit == nil then
+        kit.echo_info_msg(fmt("Current compile_lines_limit number is %d",
+            get_val("compile_lines_limit", ctx.lcfg)))
+        return
+    end
+
+    if type(limit) ~= "number" or limit < 1000 then
+        kit.echo_err_msg("Invalid limit value, it must be a number and greater than 999.")
+        return
+    end
+
+    ctx.lcfg.compile_lines_limit = limit
 end
 
 return _M

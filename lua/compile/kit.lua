@@ -3,12 +3,12 @@ local fmt = string.format
 
 --- @param msg string
 _M.echo_info_msg = function(msg)
-    vim.api.nvim_echo({ { fmt("compile plugin: %s", msg) } }, true, { err = false })
+    vim.api.nvim_echo({ { fmt("compile: %s", msg) } }, true, { err = false })
 end
 
 --- @param msg string
 _M.echo_err_msg = function(msg)
-    vim.api.nvim_echo({ { fmt("compile plugin: %s", msg) } }, true, { err = true })
+    vim.api.nvim_echo({ { fmt("compile: %s", msg) } }, true, { err = true })
 end
 
 _M.if_nil = function(val, default)

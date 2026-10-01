@@ -162,6 +162,7 @@ _M.create_user_command = function(cmd_name)
                 GIT_CONFIG_VALUE_8="false",
             },
             close_stdin = true,
+            compile_lines_limit = 20000,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
 

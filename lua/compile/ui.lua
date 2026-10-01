@@ -368,6 +368,9 @@ _M.render_stop_info_comp = function(task, ret_code)
 
     if ret_code == 0 then
         status = "finished"
+    elseif task.lines_limit_reached then
+        status = "lines limit reached"
+        hl_group = "CompileLuaWarning"
     else
         status = constants.get_err_msg(ret_code)
         hl_group = "CompileLuaError"

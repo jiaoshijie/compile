@@ -62,6 +62,7 @@ local init_ctx = function(ctx, cmd, lcfg, work_id)
     ctx.remain_chunk = nil
 
     ctx.mismatched_lines = {}
+    ctx.lines_limit_reached = false
 
     ctx.hl_table = {}
 
@@ -139,6 +140,12 @@ local parse = function(ctx, lines, finished)
             output_inserted_hook(ctx, parse_info.lnum, parse_info.lnum + #lines - 1)
         end
         parse_info.lnum = parse_info.lnum + #lines
+
+        local limit = get_val("compile_lines_limit", ctx.lcfg)
+        if type(limit) == "number" and parse_info.lnum >= limit then
+            ctx.lines_limit_reached = true
+            _M.stop_task(ctx, false)
+        end
     end
 end
 
@@ -365,14 +372,14 @@ end
 _M.stop_task = function(ctx, force)
     if not _M.is_running(ctx) then return end
 
-    if not force then
+    if force then
+        ctx.is_terminated = true
+    elseif not ctx.lines_limit_reached then
         local choice = vim.fn.confirm(
             "Stop the running compilation process?",
             "&Yes\n&No", 2, "Question"
         )
         if choice == 2 then return end
-    else
-        ctx.is_terminated = true
     end
 
     vim.fn.jobstop(ctx.job_id)

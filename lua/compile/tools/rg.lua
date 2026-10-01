@@ -152,7 +152,7 @@ local rg_vimgrep = {
 _M.create_user_command = function(cmd_name)
     local major, _, _ = kit.get_cmd_version('rg', '--version')
     if major < 15 then
-        kit.echo_info_msg("rg version is less than 15.0.0, then `Rg` will not enabled")
+        kit.echo_info_msg("rg version must not be less than 15.0.0, `Rg` isn't enabled")
         return
     end
 
@@ -178,6 +178,7 @@ _M.create_user_command = function(cmd_name)
             clear_env = true,
             env = { RIPGREP_CONFIG_PATH=cfg_path },
             close_stdin = true,
+            compile_lines_limit = 20000,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
 

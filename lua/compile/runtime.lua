@@ -119,6 +119,20 @@ local set_user_cmd = function(task)
             return vim.startswith(item, arg_lead) and item or nil
         end, vim.tbl_keys(task))
     end })
+
+    if task.type == constants.CompileType.COMP then
+        vim.api.nvim_buf_create_user_command(task.bufnr, "CompileSetLimit", function(args)
+            local limit_str = args.args
+            local limit = tonumber(limit_str)
+
+            if not limit and #limit_str ~= 0 then
+                kit.echo_err_msg(fmt("Invalid limit value: %s", limit_str))
+                return
+            end
+
+            action.set_compile_lines_limit(task, limit)
+        end, { nargs = "?" })
+    end
 end
 
 local unset_user_cmd = function(task)
@@ -139,7 +153,7 @@ _M.compile = function(cmd, buf_name, lcfg)
     end
 
     local entry = task_entries[typ]
-    buf_name = fmt("compile_lua://%s", buf_name or constants.default_name)
+    buf_name = fmt("compile://%s", buf_name or constants.default_name)
 
     -- 1. get task
     local bufnr = vim.fn.bufnr(buf_name)

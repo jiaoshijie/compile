@@ -179,6 +179,9 @@ _M.background = false
 --- @type boolean
 _M.close_stdin = false
 
+--- @type integer  -- containing the start info lines
+_M.compile_lines_limit = 100000
+
 ----------------------------- keymaps ----------------------------------------
 
 _M.keymap = {

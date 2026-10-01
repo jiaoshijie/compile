@@ -87,6 +87,7 @@ _M.create_user_command = function(cmd_name)
             clear_env = true,
             env = { GREP_COLORS="ms=0:mc=:sl=:cx=:fn=:ln=:bn=:se=:ne" },
             close_stdin = true,
+            compile_lines_limit = 20000,
         })
     end, { force = true, nargs = "+", complete = "file", bang = true })
 

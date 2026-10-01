@@ -64,6 +64,7 @@
 --- @field is_terminated boolean
 --- @field remain_chunk string
 --- @field mismatched_lines string[]
+--- @field lines_limit_reached boolean
 --  ui
 --- @field cache_lines string[]
 --- @field cache_lnum integer
