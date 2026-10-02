@@ -14,11 +14,11 @@ RUN_LIST=
 NEOVIM_BIN_PATH=${JSJ_NEOVIM_BIN:-$(command -v nvim)}
 
 if [[ "$TERM" == "dumb" ]]; then
-  RED='\e[1;31m'
-  RESET='\e[0m'
-else
   RED=
   RESET=
+else
+  RED='\e[1;31m'
+  RESET='\e[0m'
 fi
 
 _have() { type "$1" &>/dev/null; }
