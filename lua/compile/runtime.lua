@@ -237,4 +237,38 @@ _M.statusline = function(winid)
     return task and task.stat_info
 end
 
+local exit_state = function(ret_code)
+    if ret_code == false then return "" end
+
+    if ret_code == nil then
+        return fmt("%%#CompileLuaWarning#run%%* ")
+    end
+
+    if ret_code == 0 then
+        return fmt("%%#CompileLuaInfo#exit(0)%%* ")
+    end
+
+    local msg = "exit"
+    if ret_code > 128 and constants.get_signal_str(ret_code - 128) then
+        msg = "signal"
+        ret_code = ret_code - 128
+    end
+
+    return fmt("%%#CompileLuaError#%s(%d)%%* ", msg, ret_code)
+end
+
+_M.statusline_str = function(winid)
+    local stat = _M.statusline(winid)
+
+    if not stat then return "" end
+
+    local state = exit_state(stat.ret_code)
+
+    return fmt(" [%s%%#%s#%d%%* %%#%s#%d%%* %%#%s#%d%%* %%#%s#%d%%*] ", state,
+        "CompileLuaError", stat[constants.Severity.ERROR],
+        "CompileLuaWarning", stat[constants.Severity.WARNING],
+        "CompileLuaInfo", stat[constants.Severity.INFO],
+        "CompileLuaHint", stat[constants.Severity.HINT])
+end
+
 return _M

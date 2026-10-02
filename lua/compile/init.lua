@@ -23,4 +23,8 @@ _M.statusline = function(winid)
     return require("compile.runtime").statusline(winid)
 end
 
+_M.statusline_str = function(winid)
+    return require("compile.runtime").statusline_str(winid)
+end
+
 return _M
