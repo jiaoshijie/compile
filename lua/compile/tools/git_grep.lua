@@ -120,50 +120,55 @@ local ggrep_vimgrep = {
     matchers_alist = { null },
 }
 
+local lcfg = {
+    -- matchers
+    matchers_alist = nil,
+    directory_matcher = false,
+    keyword_matchers = {},
+    cmd_cd_matcher = false,
+    -- callbacks
+    on_output_parsed_hook_fn = output_parsed,
+    -- options
+    debug = false,
+    error_msg = "match",
+    search_whole_directory_stack = false,
+    clear_env = true,
+    env = nil,
+    close_stdin = true,
+    compile_lines_limit = 20000,
+}
+
 _M.create_user_command = function(cmd_name)
     local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
         local cmd = fmt("git grep -zHIn --column --color=always %s", args.args)
         is_heading = _search_heading:match(args.args) ~= nil
         local ggrep = is_heading and ggrep_heading or ggrep_vimgrep
 
-        require("compile").compile(cmd, "[compilation.git_grep]", {
-            -- matchers
-            matchers_alist = ggrep.matchers_alist,
-            directory_matcher = false,
-            keyword_matchers = {},
-            cmd_cd_matcher = false,
-            -- callbacks
-            on_output_parsed_hook_fn = output_parsed,
-            -- options
-            debug = args.bang,
-            error_msg = "match",
-            search_whole_directory_stack = false,
-            clear_env = true,
-            env = {
-                -- https://git-scm.com/docs/git-config#Documentation/git-config.txt-colorgrepslot
-                GIT_CONFIG_COUNT=9,
-                GIT_CONFIG_KEY_0="color.grep.context",
-                GIT_CONFIG_VALUE_0="0",
-                GIT_CONFIG_KEY_1="color.grep.filename",
-                GIT_CONFIG_VALUE_1=ggrep.hl_filename,
-                GIT_CONFIG_KEY_2="color.grep.function",
-                GIT_CONFIG_VALUE_2="1",
-                GIT_CONFIG_KEY_3="color.grep.lineNumber",
-                GIT_CONFIG_VALUE_3="",
-                GIT_CONFIG_KEY_4="color.grep.column",
-                GIT_CONFIG_VALUE_4="",
-                GIT_CONFIG_KEY_5="color.grep.match",  -- matchContext and matchSelected
-                GIT_CONFIG_VALUE_5="3",
-                GIT_CONFIG_KEY_6="color.grep.selected",
-                GIT_CONFIG_VALUE_6="",
-                GIT_CONFIG_KEY_7="color.grep.separator",
-                GIT_CONFIG_VALUE_7="",
-                GIT_CONFIG_KEY_8="core.quotePath",
-                GIT_CONFIG_VALUE_8="false",
-            },
-            close_stdin = true,
-            compile_lines_limit = 20000,
-        })
+        lcfg.debug = args.bang
+        lcfg.matchers_alist = ggrep.matchers_alist
+        lcfg.env = {
+            -- https://git-scm.com/docs/git-config#Documentation/git-config.txt-colorgrepslot
+            GIT_CONFIG_COUNT=9,
+            GIT_CONFIG_KEY_0="color.grep.context",
+            GIT_CONFIG_VALUE_0="0",
+            GIT_CONFIG_KEY_1="color.grep.filename",
+            GIT_CONFIG_VALUE_1=ggrep.hl_filename,
+            GIT_CONFIG_KEY_2="color.grep.function",
+            GIT_CONFIG_VALUE_2="1",
+            GIT_CONFIG_KEY_3="color.grep.lineNumber",
+            GIT_CONFIG_VALUE_3="",
+            GIT_CONFIG_KEY_4="color.grep.column",
+            GIT_CONFIG_VALUE_4="",
+            GIT_CONFIG_KEY_5="color.grep.match",  -- matchContext and matchSelected
+            GIT_CONFIG_VALUE_5="3",
+            GIT_CONFIG_KEY_6="color.grep.selected",
+            GIT_CONFIG_VALUE_6="",
+            GIT_CONFIG_KEY_7="color.grep.separator",
+            GIT_CONFIG_VALUE_7="",
+            GIT_CONFIG_KEY_8="core.quotePath",
+            GIT_CONFIG_VALUE_8="false",
+        }
+        require("compile").compile(cmd, "[compilation.git_grep]", lcfg)
     end, { force = true, nargs = "+", complete = "file", bang = true })
 
     if not ok and type(reason) == "string" then

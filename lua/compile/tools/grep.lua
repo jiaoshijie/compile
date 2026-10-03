@@ -68,27 +68,30 @@ end
 
 local _M = {}
 
+local lcfg = {
+    -- matchers
+    matchers_alist = { match, context },
+    directory_matcher = false,
+    keyword_matchers = {},
+    cmd_cd_matcher = false,
+    -- callbacks
+    on_output_parsed_hook_fn = output_parsed,
+    -- options
+    debug = false,
+    error_msg = "match",
+    search_whole_directory_stack = false,
+    clear_env = true,
+    env = { GREP_COLORS="ms=0:mc=:sl=:cx=:fn=:ln=:bn=:se=:ne" },
+    close_stdin = true,
+    compile_lines_limit = 20000,
+}
+
 _M.create_user_command = function(cmd_name)
     local ok, reason = pcall(vim.api.nvim_create_user_command, cmd_name, function(args)
         local cmd = fmt("grep -ZHInr --color=always --exclude-dir=.git %s", args.args)
 
-        require("compile").compile(cmd, "[compilation.grep]", {
-            -- matchers
-            matchers_alist = { match, context },
-            directory_matcher = false,
-            keyword_matchers = {},
-            cmd_cd_matcher = false,
-            -- callbacks
-            on_output_parsed_hook_fn = output_parsed,
-            -- options
-            debug = args.bang,
-            error_msg = "match",
-            search_whole_directory_stack = false,
-            clear_env = true,
-            env = { GREP_COLORS="ms=0:mc=:sl=:cx=:fn=:ln=:bn=:se=:ne" },
-            close_stdin = true,
-            compile_lines_limit = 20000,
-        })
+        lcfg.debug = args.bang
+        require("compile").compile(cmd, "[compilation.grep]", lcfg)
     end, { force = true, nargs = "+", complete = "file", bang = true })
 
     if not ok and type(reason) == "string" then
